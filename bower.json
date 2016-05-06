@@ -1,0 +1,28 @@
+{
+  "name": "zsfootball-table",
+  "version": "0.2.0",
+  "description": "My awesome Metal.js project",
+  "main": [
+    "build/globals/zsFootballTable-min.js",
+    "build/globals/zsFootballTable.js",
+    "build/zsFootballTable.css"
+  ], 
+  "authors": [
+    "Zsolt Szabo <zsolt.szabo@liferay.com>"
+  ],
+  "license": "BSD",
+  "keywords": [
+    "metaljs",
+    "zsfootball",
+    "tabel"
+  ],
+  "homepage": "https://github.com/zsagia/zsfootball-table",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
