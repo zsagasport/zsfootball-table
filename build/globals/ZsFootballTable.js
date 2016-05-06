@@ -11664,7 +11664,9 @@ babelHelpers;
      */
     function $render(opt_data, opt_ignored, opt_ijData) {
       ie_open('div', null, null, 'id', opt_data.id, 'class', 'zsfootball-table');
-      $renderRange_({ maxValue: opt_data.rounds.length, value: opt_data.selectedRound }, null, opt_ijData);
+      if (opt_data.showRange) {
+        $renderRange_({ maxValue: opt_data.rounds.length, value: opt_data.selectedRound }, null, opt_ijData);
+      }
       $renderTable_(soy.$$augmentMap(opt_data.rounds, { columnConfig: opt_data.columnConfig, columns: opt_data.tableColumnNames, columnClasses: opt_data.tableColumnClassNames, elementClasses: opt_data.elementClasses, value: opt_data.rounds[opt_data.selectedRound - 1] }), null, opt_ijData);
       ie_close('div');
     }
@@ -11684,15 +11686,15 @@ babelHelpers;
       ie_open('table', null, null, 'class', 'table' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
       ie_open('thead');
       ie_open('tr');
-      var keyList28 = soy.$$getMapKeys(opt_data.columnConfig);
-      var keyListLen28 = keyList28.length;
-      for (var keyIndex28 = 0; keyIndex28 < keyListLen28; keyIndex28++) {
-        var keyData28 = keyList28[keyIndex28];
-        var columnIndex__soy20 = keyIndex28;
-        if (opt_data.columnConfig[keyData28]) {
-          ie_open('th', null, null, 'class', 'col-' + opt_data.columnClasses[columnIndex__soy20]);
+      var keyList30 = soy.$$getMapKeys(opt_data.columnConfig);
+      var keyListLen30 = keyList30.length;
+      for (var keyIndex30 = 0; keyIndex30 < keyListLen30; keyIndex30++) {
+        var keyData30 = keyList30[keyIndex30];
+        var columnIndex__soy22 = keyIndex30;
+        if (opt_data.columnConfig[keyData30]) {
+          ie_open('th', null, null, 'class', 'col-' + opt_data.columnClasses[columnIndex__soy22]);
           ie_open('span', null, null, 'class', 'table-column');
-          itext((goog.asserts.assert(opt_data.columns[keyData28] != null), opt_data.columns[keyData28]));
+          itext((goog.asserts.assert(opt_data.columns[keyData30] != null), opt_data.columns[keyData30]));
           ie_close('span');
           ie_close('th');
         }
@@ -11700,12 +11702,12 @@ babelHelpers;
       ie_close('tr');
       ie_close('thead');
       ie_open('tbody');
-      var arrayRowValueList37 = opt_data.value;
-      var arrayRowValueListLen37 = arrayRowValueList37.length;
-      for (var arrayRowValueIndex37 = 0; arrayRowValueIndex37 < arrayRowValueListLen37; arrayRowValueIndex37++) {
-        var arrayRowValueData37 = arrayRowValueList37[arrayRowValueIndex37];
-        var rowIndex__soy31 = arrayRowValueIndex37 + 1;
-        $renderRow_({ arrayRowValue: arrayRowValueData37, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy31 }, null, opt_ijData);
+      var arrayRowValueList39 = opt_data.value;
+      var arrayRowValueListLen39 = arrayRowValueList39.length;
+      for (var arrayRowValueIndex39 = 0; arrayRowValueIndex39 < arrayRowValueListLen39; arrayRowValueIndex39++) {
+        var arrayRowValueData39 = arrayRowValueList39[arrayRowValueIndex39];
+        var rowIndex__soy33 = arrayRowValueIndex39 + 1;
+        $renderRow_({ arrayRowValue: arrayRowValueData39, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy33 }, null, opt_ijData);
       }
       ie_close('tbody');
       ie_close('table');
@@ -11724,13 +11726,13 @@ babelHelpers;
      */
     function $renderRow_(opt_data, opt_ignored, opt_ijData) {
       ie_open('tr', null, null, 'class', 'row-' + opt_data.rowIndex);
-      var keyList51 = soy.$$getMapKeys(opt_data.arrayRowValue);
-      var keyListLen51 = keyList51.length;
-      for (var keyIndex51 = 0; keyIndex51 < keyListLen51; keyIndex51++) {
-        var keyData51 = keyList51[keyIndex51];
-        if (opt_data.columnConfig[keyData51]) {
-          ie_open('td', null, null, 'class', opt_data.columnClasses[keyIndex51]);
-          itext((goog.asserts.assert(opt_data.arrayRowValue[keyData51] != null), opt_data.arrayRowValue[keyData51]));
+      var keyList53 = soy.$$getMapKeys(opt_data.arrayRowValue);
+      var keyListLen53 = keyList53.length;
+      for (var keyIndex53 = 0; keyIndex53 < keyListLen53; keyIndex53++) {
+        var keyData53 = keyList53[keyIndex53];
+        if (opt_data.columnConfig[keyData53]) {
+          ie_open('td', null, null, 'class', opt_data.columnClasses[keyIndex53]);
+          itext((goog.asserts.assert(opt_data.arrayRowValue[keyData53] != null), opt_data.arrayRowValue[keyData53]));
           ie_close('td');
         }
       }
@@ -11757,8 +11759,8 @@ babelHelpers;
       $renderRange_.soyTemplateName = 'ZsFootballTable.renderRange_';
     }
 
-    exports.render.params = ["elementClasses", "columnConfig", "id", "rounds", "selectedRound", "tableColumnNames", "tableColumnClassNames"];
-    exports.render.types = { "elementClasses": "any", "columnConfig": "any", "id": "any", "rounds": "any", "selectedRound": "any", "tableColumnNames": "any", "tableColumnClassNames": "any" };
+    exports.render.params = ["elementClasses", "columnConfig", "id", "rounds", "selectedRound", "showRange", "tableColumnNames", "tableColumnClassNames"];
+    exports.render.types = { "elementClasses": "any", "columnConfig": "any", "id": "any", "rounds": "any", "selectedRound": "any", "showRange": "any", "tableColumnNames": "any", "tableColumnClassNames": "any" };
     exports.renderTable_.params = ["columnConfig", "columns", "columnClasses", "elementClasses", "value"];
     exports.renderTable_.types = { "columnConfig": "any", "columns": "any", "columnClasses": "any", "elementClasses": "any", "value": "any" };
     exports.renderRow_.params = ["arrayRowValue", "columnConfig", "columnClasses", "rowIndex"];
@@ -12083,6 +12085,14 @@ babelHelpers;
    */
 		selectedRound: {
 			value: 0
+		},
+
+		/**
+   * 
+   * @type {boolean}
+   */
+		showRange: {
+			value: true
 		},
 
 		/**

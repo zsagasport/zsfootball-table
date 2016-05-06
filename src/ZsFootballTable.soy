@@ -7,15 +7,18 @@
  * @param id
  * @param rounds
  * @param selectedRound
+ * @param showRange
  * @param tableColumnNames
  * @param tableColumnClassNames
  */
 {template .render}
 	<div id="{$id}" class="zsfootball-table">
-	{call .renderRange_}
-		{param maxValue: $rounds.length /}
-		{param value: $selectedRound /}
-	{/call}
+	{if $showRange}
+		{call .renderRange_}
+			{param maxValue: $rounds.length /}
+			{param value: $selectedRound /}
+		{/call}
+	{/if}
 	{call .renderTable_ data="$rounds"}
 		{param columnConfig: $columnConfig /}
 		{param columns: $tableColumnNames /}

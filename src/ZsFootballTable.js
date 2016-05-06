@@ -279,6 +279,14 @@ ZsFootballTable.STATE = {
 	},
 
 	/**
+	 * 
+	 * @type {boolean}
+	 */
+	showRange: {
+		value: true
+	},
+
+	/**
 	 * Column names
 	 * @type {string}
 	 */
