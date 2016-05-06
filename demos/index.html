@@ -17,9 +17,29 @@
 	</style>
 </head>
 <body>
-	<h1>ZsFootballTable</h1>
+	<h1>ZsFootballTable Detailed</h1>
 	<script type="text/javascript">
 		new metal.ZsFootballTable({
+			elementClasses: 'table-striped table-bordered',
+			matches: matches
+		});
+	</script>
+
+	<h1>ZsFootballTable Simple</h1>
+	<script type="text/javascript">
+		new metal.ZsFootballTable({
+			columnConfig:{
+				position: true,
+				lastPosition: false,
+				club: true,
+				played: false,
+				won: false,
+				drawn: false,
+				lost: false,
+				goalFor: false,
+				goalAgainst: false,
+				points: true
+			},
 			elementClasses: 'table-striped table-bordered',
 			matches: matches
 		});
