@@ -235,6 +235,25 @@ ZsFootballTable.STATE = {
 	},
 
 	/**
+	 * columConfig
+	 * @type {object}
+	 */
+	columnConfig: {
+		value: {
+			position: true,
+			lastPosition: true,
+			club: true,
+			played: true,
+			won: true,
+			drawn: true,
+			lost: true,
+			goalFor: true,
+			goalAgainst: true,
+			points: true
+		}
+	},
+
+	/**
 	 * Matches
 	 * @type {Array}
 	 */
@@ -264,7 +283,18 @@ ZsFootballTable.STATE = {
 	 * @type {string}
 	 */
 	tableColumnNames: {
-		value: ['Pos','Last Pos','Club','Played','Won','Drawn','Lost','Goal For','Goal Against','Points']
+		value: {
+			position:'Pos',
+			lastPosition: 'Last Pos',
+			club: 'Club',
+			played: 'Played',
+			won: 'Won',
+			drawn: 'Drawn',
+			lost: 'Lost',
+			goalFor: 'Goal For',
+			goalAgainst: 'Goal Against',
+			points: 'Points'
+		}
 	},
 
 	/**

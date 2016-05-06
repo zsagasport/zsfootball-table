@@ -44,7 +44,7 @@ function $render(opt_data, opt_ignored, opt_ijData) {
       'id', opt_data.id,
       'class', 'zsfootball-table');
     $renderRange_({maxValue: opt_data.rounds.length, value: opt_data.selectedRound}, null, opt_ijData);
-    $renderTable_(soy.$$augmentMap(opt_data.rounds, {columns: opt_data.tableColumnNames, columnClasses: opt_data.tableColumnClassNames, elementClasses: opt_data.elementClasses, value: opt_data.rounds[opt_data.selectedRound - 1]}), null, opt_ijData);
+    $renderTable_(soy.$$augmentMap(opt_data.rounds, {columnConfig: opt_data.columnConfig, columns: opt_data.tableColumnNames, columnClasses: opt_data.tableColumnClassNames, elementClasses: opt_data.elementClasses, value: opt_data.rounds[opt_data.selectedRound - 1]}), null, opt_ijData);
   ie_close('div');
 }
 exports.render = $render;
@@ -65,27 +65,30 @@ function $renderTable_(opt_data, opt_ignored, opt_ijData) {
       'class', 'table' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
     ie_open('thead');
       ie_open('tr');
-        var columnList24 = opt_data.columns;
-        var columnListLen24 = columnList24.length;
-        for (var columnIndex24 = 0; columnIndex24 < columnListLen24; columnIndex24++) {
-          var columnData24 = columnList24[columnIndex24];
-          ie_open('th', null, null,
-              'class', 'col-' + opt_data.columnClasses[columnIndex24]);
-            ie_open('span', null, null,
-                'class', 'table-column');
-              itext((goog.asserts.assert((columnData24) != null), columnData24));
-            ie_close('span');
-          ie_close('th');
+        var keyList28 = soy.$$getMapKeys(opt_data.columnConfig);
+        var keyListLen28 = keyList28.length;
+        for (var keyIndex28 = 0; keyIndex28 < keyListLen28; keyIndex28++) {
+          var keyData28 = keyList28[keyIndex28];
+          var columnIndex__soy20 = keyIndex28;
+          if (opt_data.columnConfig[keyData28]) {
+            ie_open('th', null, null,
+                'class', 'col-' + opt_data.columnClasses[columnIndex__soy20]);
+              ie_open('span', null, null,
+                  'class', 'table-column');
+                itext((goog.asserts.assert((opt_data.columns[keyData28]) != null), opt_data.columns[keyData28]));
+              ie_close('span');
+            ie_close('th');
+          }
         }
       ie_close('tr');
     ie_close('thead');
     ie_open('tbody');
-      var arrayRowValueList32 = opt_data.value;
-      var arrayRowValueListLen32 = arrayRowValueList32.length;
-      for (var arrayRowValueIndex32 = 0; arrayRowValueIndex32 < arrayRowValueListLen32; arrayRowValueIndex32++) {
-        var arrayRowValueData32 = arrayRowValueList32[arrayRowValueIndex32];
-        var rowIndex__soy27 = arrayRowValueIndex32 + 1;
-        $renderRow_({arrayRowValue: arrayRowValueData32, columnClasses: opt_data.columnClasses, rowIndex: rowIndex__soy27}, null, opt_ijData);
+      var arrayRowValueList37 = opt_data.value;
+      var arrayRowValueListLen37 = arrayRowValueList37.length;
+      for (var arrayRowValueIndex37 = 0; arrayRowValueIndex37 < arrayRowValueListLen37; arrayRowValueIndex37++) {
+        var arrayRowValueData37 = arrayRowValueList37[arrayRowValueIndex37];
+        var rowIndex__soy31 = arrayRowValueIndex37 + 1;
+        $renderRow_({arrayRowValue: arrayRowValueData37, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy31}, null, opt_ijData);
       }
     ie_close('tbody');
   ie_close('table');
@@ -106,14 +109,16 @@ if (goog.DEBUG) {
 function $renderRow_(opt_data, opt_ignored, opt_ijData) {
   ie_open('tr', null, null,
       'class', 'row-' + opt_data.rowIndex);
-    var keyList44 = soy.$$getMapKeys(opt_data.arrayRowValue);
-    var keyListLen44 = keyList44.length;
-    for (var keyIndex44 = 0; keyIndex44 < keyListLen44; keyIndex44++) {
-      var keyData44 = keyList44[keyIndex44];
-      ie_open('td', null, null,
-          'class', opt_data.columnClasses[keyIndex44]);
-        itext((goog.asserts.assert((opt_data.arrayRowValue[keyData44]) != null), opt_data.arrayRowValue[keyData44]));
-      ie_close('td');
+    var keyList51 = soy.$$getMapKeys(opt_data.arrayRowValue);
+    var keyListLen51 = keyList51.length;
+    for (var keyIndex51 = 0; keyIndex51 < keyListLen51; keyIndex51++) {
+      var keyData51 = keyList51[keyIndex51];
+      if (opt_data.columnConfig[keyData51]) {
+        ie_open('td', null, null,
+            'class', opt_data.columnClasses[keyIndex51]);
+          itext((goog.asserts.assert((opt_data.arrayRowValue[keyData51]) != null), opt_data.arrayRowValue[keyData51]));
+        ie_close('td');
+      }
     }
   ie_close('tr');
 }
@@ -145,12 +150,12 @@ if (goog.DEBUG) {
   $renderRange_.soyTemplateName = 'ZsFootballTable.renderRange_';
 }
 
-exports.render.params = ["elementClasses","id","rounds","selectedRound","tableColumnNames","tableColumnClassNames"];
-exports.render.types = {"elementClasses":"any","id":"any","rounds":"any","selectedRound":"any","tableColumnNames":"any","tableColumnClassNames":"any"};
-exports.renderTable_.params = ["columns","columnClasses","elementClasses","value"];
-exports.renderTable_.types = {"columns":"any","columnClasses":"any","elementClasses":"any","value":"any"};
-exports.renderRow_.params = ["arrayRowValue","columnClasses","rowIndex"];
-exports.renderRow_.types = {"arrayRowValue":"any","columnClasses":"any","rowIndex":"any"};
+exports.render.params = ["elementClasses","columnConfig","id","rounds","selectedRound","tableColumnNames","tableColumnClassNames"];
+exports.render.types = {"elementClasses":"any","columnConfig":"any","id":"any","rounds":"any","selectedRound":"any","tableColumnNames":"any","tableColumnClassNames":"any"};
+exports.renderTable_.params = ["columnConfig","columns","columnClasses","elementClasses","value"];
+exports.renderTable_.types = {"columnConfig":"any","columns":"any","columnClasses":"any","elementClasses":"any","value":"any"};
+exports.renderRow_.params = ["arrayRowValue","columnConfig","columnClasses","rowIndex"];
+exports.renderRow_.types = {"arrayRowValue":"any","columnConfig":"any","columnClasses":"any","rowIndex":"any"};
 exports.renderRange_.params = ["maxValue","value"];
 exports.renderRange_.types = {"maxValue":"any","value":"any"};
 templates = exports;

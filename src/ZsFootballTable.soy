@@ -3,6 +3,7 @@
 /**
  * This renders the main element.
  * @param? elementClasses
+ * @param columnConfig
  * @param id
  * @param rounds
  * @param selectedRound
@@ -16,6 +17,7 @@
 		{param value: $selectedRound /}
 	{/call}
 	{call .renderTable_ data="$rounds"}
+		{param columnConfig: $columnConfig /}
 		{param columns: $tableColumnNames /}
 		{param columnClasses: $tableColumnClassNames /}
 		{param elementClasses: $elementClasses /}
@@ -25,6 +27,7 @@
 {/template}
 
 /**
+ * @param columnConfig
  * @param columns
  * @param columnClasses
  * @param? elementClasses
@@ -34,10 +37,13 @@
 	<table class="table{$elementClasses ? ' ' + $elementClasses : ''}">
 		<thead>
 			<tr>
-				{foreach $column in $columns}
-					<th class="col-{$columnClasses[index($column)]}">
-						<span class="table-column">{$column}</span>
-					</th>
+				{foreach $key in keys($columnConfig)}
+					{let $columnIndex: index($key) /}
+					{if $columnConfig[$key]}
+						<th class="col-{$columnClasses[$columnIndex]}">
+							<span class="table-column">{$columns[$key]}</span>
+						</th>
+					{/if}
 				{/foreach}
 			</tr>
 		</thead>
@@ -48,6 +54,7 @@
 				{call .renderRow_}
 					{param arrayRowValue: $arrayRowValue /}
 					{param columnClasses: $columnClasses /}
+					{param columnConfig: $columnConfig /}
 					{param rowIndex: $rowIndex /}
 				{/call}
 			{/foreach}
@@ -57,15 +64,18 @@
 
 /**
  * @param arrayRowValue
+ * @param columnConfig
  * @param columnClasses
  * @param rowIndex
  */
 {template .renderRow_ private="true"}
 	<tr class="row-{$rowIndex}">
 		{foreach $key in keys($arrayRowValue)}
-			<td class="{$columnClasses[index($key)]}">
-				{$arrayRowValue[$key]}
-			</td>
+			{if $columnConfig[$key]}
+				<td class="{$columnClasses[index($key)]}">
+					{$arrayRowValue[$key]}
+				</td>
+			{/if}
 		{/foreach}
 	</tr>
 {/template}
