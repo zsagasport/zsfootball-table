@@ -51,16 +51,18 @@
 			</tr>
 		</thead>
 		<tbody>
-			{foreach $arrayRowValue in $value}
-				{let $rowIndex: index($arrayRowValue) + 1 /}
+			{if $value}
+				{foreach $arrayRowValue in $value}
+					{let $rowIndex: index($arrayRowValue) + 1 /}
 
-				{call .renderRow_}
-					{param arrayRowValue: $arrayRowValue /}
-					{param columnClasses: $columnClasses /}
-					{param columnConfig: $columnConfig /}
-					{param rowIndex: $rowIndex /}
-				{/call}
-			{/foreach}
+					{call .renderRow_}
+						{param arrayRowValue: $arrayRowValue /}
+						{param columnClasses: $columnClasses /}
+						{param columnConfig: $columnConfig /}
+						{param rowIndex: $rowIndex /}
+					{/call}
+				{/foreach}
+			{/if}
 		</tbody>
 	</table>
 {/template}
