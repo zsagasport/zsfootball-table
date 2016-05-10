@@ -33,27 +33,37 @@
 	</section>
 
 	<section id="section2">
-	<h1>ZsFootballTable Simple</h1>
+		<h1>ZsFootballTable Simple</h1>
+		<script type="text/javascript">
+			new metal.ZsFootballTable({
+				columnConfig:{
+					position: true,
+					lastPosition: false,
+					club: true,
+					played: false,
+					won: false,
+					drawn: false,
+					lost: false,
+					goalFor: false,
+					goalAgainst: false,
+					points: true
+				},
+				elementClasses: 'table-striped table-bordered',
+				matches: matches,
+				showRange: false
+			},
+			'#section2');
+		</script>
+	</section>
+
+	<section id="section3">
+	<h1>ZsFootballTable by URL</h1>
 	<script type="text/javascript">
 		new metal.ZsFootballTable({
-			columnConfig:{
-				position: true,
-				lastPosition: false,
-				club: true,
-				played: false,
-				won: false,
-				drawn: false,
-				lost: false,
-				goalFor: false,
-				goalAgainst: false,
-				points: true
-			},
 			elementClasses: 'table-striped table-bordered',
-			matches: matches,
-			showRange: false
+			url: 'http://localhost:8888/matches?roundId=301'
 		},
-		'#section2');
+		'#section3');
 	</script>
-</section>
 </body>
 </html>
