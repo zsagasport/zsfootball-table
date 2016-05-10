@@ -38,6 +38,44 @@ babelHelpers.possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
+babelHelpers.slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 babelHelpers;
 'use strict';
 
@@ -932,6 +970,1846 @@ babelHelpers;
   this.metalNamed.metal.Disposable = Disposable;
   this.metalNamed.metal.object = object;
   this.metalNamed.metal.string = string;
+}).call(this);
+'use strict';
+
+/**
+ * Parses the given uri string into an object.
+ * @param {*=} opt_uri Optional string URI to parse
+ */
+
+(function () {
+	function parseFromAnchor(opt_uri) {
+		var link = document.createElement('a');
+		link.href = opt_uri;
+		return {
+			hash: link.hash,
+			hostname: link.hostname,
+			password: link.password,
+			pathname: link.pathname[0] === '/' ? link.pathname : '/' + link.pathname,
+			port: link.port,
+			protocol: link.protocol,
+			search: link.search,
+			username: link.username
+		};
+	}
+
+	this.metal.parseFromAnchor = parseFromAnchor;
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metalNamed.metal.core;
+	var parseFromAnchor = this.metal.parseFromAnchor;
+
+	/**
+  * Parses the given uri string into an object. The URL function will be used
+  * when present, otherwise we'll fall back to the anchor node element.
+  * @param {*=} opt_uri Optional string URI to parse
+  */
+
+	function parse(opt_uri) {
+		if (core.isFunction(URL) && URL.length) {
+			return new URL(opt_uri);
+		} else {
+			return parseFromAnchor(opt_uri);
+		}
+	}
+
+	this.metal.parse = parse;
+}).call(this);
+'use strict';
+
+(function () {
+	var Disposable = this.metalNamed.metal.Disposable;
+
+	/**
+  * A cached reference to the create function.
+  */
+
+	var create = Object.create;
+
+	/**
+  * Case insensitive string Multimap implementation. Allows multiple values for
+  * the same key name.
+  * @extends {Disposable}
+  */
+
+	var MultiMap = function (_Disposable) {
+		babelHelpers.inherits(MultiMap, _Disposable);
+
+		function MultiMap() {
+			babelHelpers.classCallCheck(this, MultiMap);
+
+			var _this = babelHelpers.possibleConstructorReturn(this, _Disposable.call(this));
+
+			_this.keys = create(null);
+			_this.values = create(null);
+			return _this;
+		}
+
+		/**
+   * Adds value to a key name.
+   * @param {string} name
+   * @param {*} value
+   * @chainable
+   */
+
+
+		MultiMap.prototype.add = function add(name, value) {
+			this.keys[name.toLowerCase()] = name;
+			this.values[name.toLowerCase()] = this.values[name.toLowerCase()] || [];
+			this.values[name.toLowerCase()].push(value);
+			return this;
+		};
+
+		/**
+   * Clears map names and values.
+   * @chainable
+   */
+
+
+		MultiMap.prototype.clear = function clear() {
+			this.keys = create(null);
+			this.values = create(null);
+			return this;
+		};
+
+		/**
+   * Checks if map contains a value to the key name.
+   * @param {string} name
+   * @return {boolean}
+   * @chainable
+   */
+
+
+		MultiMap.prototype.contains = function contains(name) {
+			return name.toLowerCase() in this.values;
+		};
+
+		/**
+   * @inheritDoc
+   */
+
+
+		MultiMap.prototype.disposeInternal = function disposeInternal() {
+			this.values = null;
+		};
+
+		/**
+   * Gets the first added value from a key name.
+   * @param {string} name
+   * @return {*}
+   * @chainable
+   */
+
+
+		MultiMap.prototype.get = function get(name) {
+			var values = this.values[name.toLowerCase()];
+			if (values) {
+				return values[0];
+			}
+		};
+
+		/**
+   * Gets all values from a key name.
+   * @param {string} name
+   * @return {Array.<*>}
+   */
+
+
+		MultiMap.prototype.getAll = function getAll(name) {
+			return this.values[name.toLowerCase()];
+		};
+
+		/**
+   * Returns true if the map is empty, false otherwise.
+   * @return {boolean}
+   */
+
+
+		MultiMap.prototype.isEmpty = function isEmpty() {
+			return this.size() === 0;
+		};
+
+		/**
+   * Gets array of key names.
+   * @return {Array.<string>}
+   */
+
+
+		MultiMap.prototype.names = function names() {
+			var _this2 = this;
+
+			return Object.keys(this.values).map(function (key) {
+				return _this2.keys[key];
+			});
+		};
+
+		/**
+   * Removes all values from a key name.
+   * @param {string} name
+   * @chainable
+   */
+
+
+		MultiMap.prototype.remove = function remove(name) {
+			delete this.keys[name.toLowerCase()];
+			delete this.values[name.toLowerCase()];
+			return this;
+		};
+
+		/**
+   * Sets the value of a key name. Relevant to replace the current values with
+   * a new one.
+   * @param {string} name
+   * @param {*} value
+   * @chainable
+   */
+
+
+		MultiMap.prototype.set = function set(name, value) {
+			this.keys[name.toLowerCase()] = name;
+			this.values[name.toLowerCase()] = [value];
+			return this;
+		};
+
+		/**
+   * Gets the size of the map key names.
+   * @return {number}
+   */
+
+
+		MultiMap.prototype.size = function size() {
+			return this.names().length;
+		};
+
+		/**
+   * Returns the parsed values as a string.
+   * @return {string}
+   */
+
+
+		MultiMap.prototype.toString = function toString() {
+			return JSON.stringify(this.values);
+		};
+
+		return MultiMap;
+	}(Disposable);
+
+	this.metal.MultiMap = MultiMap;
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metalNamed.metal.core;
+	var string = this.metalNamed.metal.string;
+	var parse = this.metal.parse;
+	var MultiMap = this.metal.MultiMap;
+
+
+	var parseFn_ = parse;
+
+	var Uri = function () {
+
+		/**
+   * This class contains setters and getters for the parts of the URI.
+   * The following figure displays an example URIs and their component parts.
+   *
+   *                                  path
+   *	                             ┌───┴────┐
+   *	  abc://example.com:123/path/data?key=value#fragid1
+   *	  └┬┘   └────┬────┘ └┬┘           └───┬───┘ └──┬──┘
+   * protocol  hostname  port            search    hash
+   *          └──────┬───────┘
+   *                host
+   *
+   * @param {*=} opt_uri Optional string URI to parse
+   * @constructor
+   */
+
+		function Uri() {
+			var opt_uri = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			babelHelpers.classCallCheck(this, Uri);
+
+			this.url = Uri.parse(this.maybeAddProtocolAndHostname_(opt_uri));
+		}
+
+		/**
+   * Adds parameters to uri from a <code>MultiMap</code> as source.
+   * @param {MultiMap} multimap The <code>MultiMap</code> containing the
+   *   parameters.
+   * @protected
+   * @chainable
+   */
+
+
+		Uri.prototype.addParametersFromMultiMap = function addParametersFromMultiMap(multimap) {
+			var _this = this;
+
+			multimap.names().forEach(function (name) {
+				multimap.getAll(name).forEach(function (value) {
+					_this.addParameterValue(name, value);
+				});
+			});
+			return this;
+		};
+
+		/**
+   * Adds the value of the named query parameters.
+   * @param {string} key The parameter to set.
+   * @param {*} value The new value. Will be explicitly casted to String.
+   * @chainable
+   */
+
+
+		Uri.prototype.addParameterValue = function addParameterValue(name, value) {
+			this.ensureQueryInitialized_();
+			if (core.isDef(value)) {
+				value = String(value);
+			}
+			this.query.add(name, value);
+			return this;
+		};
+
+		/**
+   * Adds the values of the named query parameter.
+   * @param {string} key The parameter to set.
+   * @param {*} value The new value.
+   * @chainable
+   */
+
+
+		Uri.prototype.addParameterValues = function addParameterValues(name, values) {
+			var _this2 = this;
+
+			values.forEach(function (value) {
+				return _this2.addParameterValue(name, value);
+			});
+			return this;
+		};
+
+		/**
+   * Ensures query internal map is initialized and synced with initial value
+   * extracted from URI search part.
+   * @protected
+   */
+
+
+		Uri.prototype.ensureQueryInitialized_ = function ensureQueryInitialized_() {
+			var _this3 = this;
+
+			if (this.query) {
+				return;
+			}
+			this.query = new MultiMap();
+			var search = this.url.search;
+			if (search) {
+				search.substring(1).split('&').forEach(function (param) {
+					var _param$split = param.split('=');
+
+					var _param$split2 = babelHelpers.slicedToArray(_param$split, 2);
+
+					var key = _param$split2[0];
+					var value = _param$split2[1];
+
+					if (core.isDef(value)) {
+						value = Uri.urlDecode(value);
+					}
+					_this3.addParameterValue(key, value);
+				});
+			}
+		};
+
+		/**
+   * Gets the hash part of uri.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getHash = function getHash() {
+			return this.url.hash || '';
+		};
+
+		/**
+   * Gets the host part of uri. E.g. <code>[hostname]:[port]</code>.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getHost = function getHost() {
+			var host = this.getHostname();
+			if (host) {
+				var port = this.getPort();
+				if (port && port !== '80') {
+					host += ':' + port;
+				}
+			}
+			return host;
+		};
+
+		/**
+   * Gets the hostname part of uri without protocol and port.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getHostname = function getHostname() {
+			var hostname = this.url.hostname;
+			if (hostname === Uri.HOSTNAME_PLACEHOLDER) {
+				return '';
+			}
+			return hostname;
+		};
+
+		/**
+   * Gets the origin part of uri. E.g. <code>http://[hostname]:[port]</code>.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getOrigin = function getOrigin() {
+			var host = this.getHost();
+			if (host) {
+				return this.getProtocol() + '//' + host;
+			}
+			return '';
+		};
+
+		/**
+   * Returns the first value for a given parameter or undefined if the given
+   * parameter name does not appear in the query string.
+   * @param {string} paramName Unescaped parameter name.
+   * @return {string|undefined} The first value for a given parameter or
+   *   undefined if the given parameter name does not appear in the query
+   *   string.
+   */
+
+
+		Uri.prototype.getParameterValue = function getParameterValue(name) {
+			this.ensureQueryInitialized_();
+			return this.query.get(name);
+		};
+
+		/**
+   * Returns the value<b>s</b> for a given parameter as a list of decoded
+   * query parameter values.
+   * @param {string} name The parameter to get values for.
+   * @return {!Array<?>} The values for a given parameter as a list of decoded
+   *   query parameter values.
+   */
+
+
+		Uri.prototype.getParameterValues = function getParameterValues(name) {
+			this.ensureQueryInitialized_();
+			return this.query.getAll(name);
+		};
+
+		/**
+   * Returns the name<b>s</b> of the parameters.
+   * @return {!Array<string>} The names for the parameters as a list of
+   *   strings.
+   */
+
+
+		Uri.prototype.getParameterNames = function getParameterNames() {
+			this.ensureQueryInitialized_();
+			return this.query.names();
+		};
+
+		/**
+   * Gets the function currently being used to parse URIs.
+   * @return {!function()}
+   */
+
+
+		Uri.getParseFn = function getParseFn() {
+			return parseFn_;
+		};
+
+		/**
+   * Gets the pathname part of uri.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getPathname = function getPathname() {
+			return this.url.pathname;
+		};
+
+		/**
+   * Gets the port number part of uri as string.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getPort = function getPort() {
+			return this.url.port;
+		};
+
+		/**
+   * Gets the protocol part of uri. E.g. <code>http:</code>.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getProtocol = function getProtocol() {
+			return this.url.protocol;
+		};
+
+		/**
+   * Gets the search part of uri. Search value is retrieved from query
+   * parameters.
+   * @return {string}
+   */
+
+
+		Uri.prototype.getSearch = function getSearch() {
+			var _this4 = this;
+
+			var search = '';
+			var querystring = '';
+			this.getParameterNames().forEach(function (name) {
+				_this4.getParameterValues(name).forEach(function (value) {
+					querystring += name;
+					if (core.isDef(value)) {
+						querystring += '=' + encodeURIComponent(value);
+					}
+					querystring += '&';
+				});
+			});
+			querystring = querystring.slice(0, -1);
+			if (querystring) {
+				search += '?' + querystring;
+			}
+			return search;
+		};
+
+		/**
+   * Checks if uri contains the parameter.
+   * @param {string} name
+   * @return {boolean}
+   */
+
+
+		Uri.prototype.hasParameter = function hasParameter(name) {
+			this.ensureQueryInitialized_();
+			return this.query.contains(name);
+		};
+
+		/**
+   * Makes this URL unique by adding a random param to it. Useful for avoiding
+   * cache.
+   */
+
+
+		Uri.prototype.makeUnique = function makeUnique() {
+			this.setParameterValue(Uri.RANDOM_PARAM, string.getRandomString());
+			return this;
+		};
+
+		/**
+   * Maybe adds protocol and a hostname placeholder on a parial URI if needed.
+   * Relevent for compatibility with <code>URL</code> native object.
+   * @param {string=} opt_uri
+   * @return {string} URI with protocol and hostname placeholder.
+   */
+
+
+		Uri.prototype.maybeAddProtocolAndHostname_ = function maybeAddProtocolAndHostname_(opt_uri) {
+			var url = opt_uri;
+			if (opt_uri.indexOf('://') === -1 && opt_uri.indexOf('javascript:') !== 0) {
+				// jshint ignore:line
+
+				url = Uri.DEFAULT_PROTOCOL;
+				if (opt_uri[0] !== '/' || opt_uri[1] !== '/') {
+					url += '//';
+				}
+
+				switch (opt_uri.charAt(0)) {
+					case '.':
+					case '?':
+					case '#':
+						url += Uri.HOSTNAME_PLACEHOLDER;
+						url += '/';
+						url += opt_uri;
+						break;
+					case '':
+					case '/':
+						if (opt_uri[1] !== '/') {
+							url += Uri.HOSTNAME_PLACEHOLDER;
+						}
+						url += opt_uri;
+						break;
+					default:
+						url += opt_uri;
+				}
+			}
+			return url;
+		};
+
+		/**
+   * Normalizes the parsed object to be in the expected standard.
+   * @param {!Object}
+   */
+
+
+		Uri.normalizeObject = function normalizeObject(parsed) {
+			var length = parsed.pathname ? parsed.pathname.length : 0;
+			if (length > 1 && parsed.pathname[length - 1] === '/') {
+				parsed.pathname = parsed.pathname.substr(0, length - 1);
+			}
+			return parsed;
+		};
+
+		/**
+   * Parses the given uri string into an object.
+   * @param {*=} opt_uri Optional string URI to parse
+   */
+
+
+		Uri.parse = function parse(opt_uri) {
+			return Uri.normalizeObject(parseFn_(opt_uri));
+		};
+
+		/**
+   * Removes the named query parameter.
+   * @param {string} name The parameter to remove.
+   * @chainable
+   */
+
+
+		Uri.prototype.removeParameter = function removeParameter(name) {
+			this.ensureQueryInitialized_();
+			this.query.remove(name);
+			return this;
+		};
+
+		/**
+   * Removes uniqueness parameter of the uri.
+   * @chainable
+   */
+
+
+		Uri.prototype.removeUnique = function removeUnique() {
+			this.removeParameter(Uri.RANDOM_PARAM);
+			return this;
+		};
+
+		/**
+   * Sets the hash.
+   * @param {string} hash
+   * @chainable
+   */
+
+
+		Uri.prototype.setHash = function setHash(hash) {
+			this.url.hash = hash;
+			return this;
+		};
+
+		/**
+   * Sets the hostname.
+   * @param {string} hostname
+   * @chainable
+   */
+
+
+		Uri.prototype.setHostname = function setHostname(hostname) {
+			this.url.hostname = hostname;
+			return this;
+		};
+
+		/**
+   * Sets the value of the named query parameters, clearing previous values
+   * for that key.
+   * @param {string} key The parameter to set.
+   * @param {*} value The new value.
+   * @chainable
+   */
+
+
+		Uri.prototype.setParameterValue = function setParameterValue(name, value) {
+			this.removeParameter(name);
+			this.addParameterValue(name, value);
+			return this;
+		};
+
+		/**
+   * Sets the values of the named query parameters, clearing previous values
+   * for that key.
+   * @param {string} key The parameter to set.
+   * @param {*} value The new value.
+   * @chainable
+   */
+
+
+		Uri.prototype.setParameterValues = function setParameterValues(name, values) {
+			var _this5 = this;
+
+			this.removeParameter(name);
+			values.forEach(function (value) {
+				return _this5.addParameterValue(name, value);
+			});
+			return this;
+		};
+
+		/**
+   * Sets the pathname.
+   * @param {string} pathname
+   * @chainable
+   */
+
+
+		Uri.prototype.setPathname = function setPathname(pathname) {
+			this.url.pathname = pathname;
+			return this;
+		};
+
+		/**
+   * Sets the port number.
+   * @param {*} port Port number.
+   * @chainable
+   */
+
+
+		Uri.prototype.setPort = function setPort(port) {
+			this.url.port = port;
+			return this;
+		};
+
+		/**
+   * Sets the function that will be used for parsing the original string uri
+   * into an object.
+   * @param {!function()} parseFn
+   */
+
+
+		Uri.setParseFn = function setParseFn(parseFn) {
+			parseFn_ = parseFn;
+		};
+
+		/**
+   * Sets the protocol. If missing <code>http:</code> is used as default.
+   * @param {string} protocol
+   * @chainable
+   */
+
+
+		Uri.prototype.setProtocol = function setProtocol(protocol) {
+			this.url.protocol = protocol;
+			if (this.url.protocol[this.url.protocol.length - 1] !== ':') {
+				this.url.protocol += ':';
+			}
+			return this;
+		};
+
+		/**
+   * @return {string} The string form of the url.
+   * @override
+   */
+
+
+		Uri.prototype.toString = function toString() {
+			var href = '';
+			var host = this.getHost();
+			if (host) {
+				href += this.getProtocol() + '//';
+			}
+			href += host + this.getPathname() + this.getSearch() + this.getHash();
+			return href;
+		};
+
+		/**
+   * Joins the given paths.
+   * @param {string} basePath
+   * @param {...string} ...paths Any number of paths to be joined with the base url.
+   * @static
+   */
+
+
+		Uri.joinPaths = function joinPaths(basePath) {
+			for (var _len = arguments.length, paths = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+				paths[_key - 1] = arguments[_key];
+			}
+
+			if (basePath.charAt(basePath.length - 1) === '/') {
+				basePath = basePath.substring(0, basePath.length - 1);
+			}
+			paths = paths.map(function (path) {
+				return path.charAt(0) === '/' ? path.substring(1) : path;
+			});
+			return [basePath].concat(paths).join('/').replace(/\/$/, '');
+		};
+
+		/**
+   * URL-decodes the string. We need to specially handle '+'s because
+   * the javascript library doesn't convert them to spaces.
+   * @param {string} str The string to url decode.
+   * @return {string} The decoded {@code str}.
+   */
+
+
+		Uri.urlDecode = function urlDecode(str) {
+			return decodeURIComponent(str.replace(/\+/g, ' '));
+		};
+
+		return Uri;
+	}();
+
+	/**
+  * Default protocol value.
+  * @type {string}
+  * @default http:
+  * @static
+  */
+
+
+	Uri.DEFAULT_PROTOCOL = 'http:';
+
+	/**
+  * Hostname placeholder. Relevant to internal usage only.
+  * @type {string}
+  * @static
+  */
+	Uri.HOSTNAME_PLACEHOLDER = 'hostname' + Date.now();
+
+	/**
+  * Name used by the param generated by `makeUnique`.
+  * @type {string}
+  * @static
+  */
+	Uri.RANDOM_PARAM = 'zx';
+
+	this.metal.Uri = Uri;
+}).call(this);
+/*!
+ * Promises polyfill from Google's Closure Library.
+ *
+ *      Copyright 2013 The Closure Library Authors. All Rights Reserved.
+ *
+ * NOTE(eduardo): Promise support is not ready on all supported browsers,
+ * therefore core.js is temporarily using Google's promises as polyfill. It
+ * supports cancellable promises and has clean and fast implementation.
+ */
+
+'use strict';
+
+(function () {
+  var core = this.metalNamed.metal.core;
+  var async = this.metalNamed.metal.async;
+
+  /**
+   * Provides a more strict interface for Thenables in terms of
+   * http://promisesaplus.com for interop with {@see CancellablePromise}.
+   *
+   * @interface
+   * @extends {IThenable.<TYPE>}
+   * @template TYPE
+   */
+
+  var Thenable = function Thenable() {};
+
+  /**
+   * Adds callbacks that will operate on the result of the Thenable, returning a
+   * new child Promise.
+   *
+   * If the Thenable is fulfilled, the {@code onFulfilled} callback will be
+   * invoked with the fulfillment value as argument, and the child Promise will
+   * be fulfilled with the return value of the callback. If the callback throws
+   * an exception, the child Promise will be rejected with the thrown value
+   * instead.
+   *
+   * If the Thenable is rejected, the {@code onRejected} callback will be invoked
+   * with the rejection reason as argument, and the child Promise will be rejected
+   * with the return value of the callback or thrown value.
+   *
+   * @param {?(function(this:THIS, TYPE):
+   *             (RESULT|IThenable.<RESULT>|Thenable))=} opt_onFulfilled A
+   *     function that will be invoked with the fulfillment value if the Promise
+   *     is fullfilled.
+   * @param {?(function(*): *)=} opt_onRejected A function that will be invoked
+   *     with the rejection reason if the Promise is rejected.
+   * @param {THIS=} opt_context An optional context object that will be the
+   *     execution context for the callbacks. By default, functions are executed
+   *     with the default this.
+   * @return {!CancellablePromise.<RESULT>} A new Promise that will receive the
+   *     result of the fulfillment or rejection callback.
+   * @template RESULT,THIS
+   */
+  Thenable.prototype.then = function () {};
+
+  /**
+   * An expando property to indicate that an object implements
+   * {@code Thenable}.
+   *
+   * {@see addImplementation}.
+   *
+   * @const
+   */
+  Thenable.IMPLEMENTED_BY_PROP = '$goog_Thenable';
+
+  /**
+   * Marks a given class (constructor) as an implementation of Thenable, so
+   * that we can query that fact at runtime. The class must have already
+   * implemented the interface.
+   * Exports a 'then' method on the constructor prototype, so that the objects
+   * also implement the extern {@see Thenable} interface for interop with
+   * other Promise implementations.
+   * @param {function(new:Thenable,...[?])} ctor The class constructor. The
+   *     corresponding class must have already implemented the interface.
+   */
+  Thenable.addImplementation = function (ctor) {
+    ctor.prototype.then = ctor.prototype.then;
+    ctor.prototype.$goog_Thenable = true;
+  };
+
+  /**
+   * @param {*} object
+   * @return {boolean} Whether a given instance implements {@code Thenable}.
+   *     The class/superclass of the instance must call {@code addImplementation}.
+   */
+  Thenable.isImplementedBy = function (object) {
+    if (!object) {
+      return false;
+    }
+    try {
+      return !!object.$goog_Thenable;
+    } catch (e) {
+      // Property access seems to be forbidden.
+      return false;
+    }
+  };
+
+  /**
+   * Like bind(), except that a 'this object' is not required. Useful when the
+   * target function is already bound.
+   *
+   * Usage:
+   * var g = partial(f, arg1, arg2);
+   * g(arg3, arg4);
+   *
+   * @param {Function} fn A function to partially apply.
+   * @param {...*} var_args Additional arguments that are partially applied to fn.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   */
+  var partial = function partial(fn) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return function () {
+      // Clone the array (with slice()) and append additional arguments
+      // to the existing arguments.
+      var newArgs = args.slice();
+      newArgs.push.apply(newArgs, arguments);
+      return fn.apply(this, newArgs);
+    };
+  };
+
+  /**
+   * Promises provide a result that may be resolved asynchronously. A Promise may
+   * be resolved by being fulfilled or rejected with a value, which will be known
+   * as the fulfillment value or the rejection reason. Whether fulfilled or
+   * rejected, the Promise result is immutable once it is set.
+   *
+   * Promises may represent results of any type, including undefined. Rejection
+   * reasons are typically Errors, but may also be of any type. Closure Promises
+   * allow for optional type annotations that enforce that fulfillment values are
+   * of the appropriate types at compile time.
+   *
+   * The result of a Promise is accessible by calling {@code then} and registering
+   * {@code onFulfilled} and {@code onRejected} callbacks. Once the Promise
+   * resolves, the relevant callbacks are invoked with the fulfillment value or
+   * rejection reason as argument. Callbacks are always invoked in the order they
+   * were registered, even when additional {@code then} calls are made from inside
+   * another callback. A callback is always run asynchronously sometime after the
+   * scope containing the registering {@code then} invocation has returned.
+   *
+   * If a Promise is resolved with another Promise, the first Promise will block
+   * until the second is resolved, and then assumes the same result as the second
+   * Promise. This allows Promises to depend on the results of other Promises,
+   * linking together multiple asynchronous operations.
+   *
+   * This implementation is compatible with the Promises/A+ specification and
+   * passes that specification's conformance test suite. A Closure Promise may be
+   * resolved with a Promise instance (or sufficiently compatible Promise-like
+   * object) created by other Promise implementations. From the specification,
+   * Promise-like objects are known as "Thenables".
+   *
+   * @see http://promisesaplus.com/
+   *
+   * @param {function(
+   *             this:RESOLVER_CONTEXT,
+   *             function((TYPE|IThenable.<TYPE>|Thenable)),
+   *             function(*)): void} resolver
+   *     Initialization function that is invoked immediately with {@code resolve}
+   *     and {@code reject} functions as arguments. The Promise is resolved or
+   *     rejected with the first argument passed to either function.
+   * @param {RESOLVER_CONTEXT=} opt_context An optional context for executing the
+   *     resolver function. If unspecified, the resolver function will be executed
+   *     in the default scope.
+   * @constructor
+   * @struct
+   * @final
+   * @implements {Thenable.<TYPE>}
+   * @template TYPE,RESOLVER_CONTEXT
+   */
+  var CancellablePromise = function CancellablePromise(resolver, opt_context) {
+    /**
+     * The internal state of this Promise. Either PENDING, FULFILLED, REJECTED, or
+     * BLOCKED.
+     * @private {CancellablePromise.State_}
+     */
+    this.state_ = CancellablePromise.State_.PENDING;
+
+    /**
+     * The resolved result of the Promise. Immutable once set with either a
+     * fulfillment value or rejection reason.
+     * @private {*}
+     */
+    this.result_ = undefined;
+
+    /**
+     * For Promises created by calling {@code then()}, the originating parent.
+     * @private {CancellablePromise}
+     */
+    this.parent_ = null;
+
+    /**
+     * The list of {@code onFulfilled} and {@code onRejected} callbacks added to
+     * this Promise by calls to {@code then()}.
+     * @private {Array.<CancellablePromise.CallbackEntry_>}
+     */
+    this.callbackEntries_ = null;
+
+    /**
+     * Whether the Promise is in the queue of Promises to execute.
+     * @private {boolean}
+     */
+    this.executing_ = false;
+
+    if (CancellablePromise.UNHANDLED_REJECTION_DELAY > 0) {
+      /**
+       * A timeout ID used when the {@code UNHANDLED_REJECTION_DELAY} is greater
+       * than 0 milliseconds. The ID is set when the Promise is rejected, and
+       * cleared only if an {@code onRejected} callback is invoked for the
+       * Promise (or one of its descendants) before the delay is exceeded.
+       *
+       * If the rejection is not handled before the timeout completes, the
+       * rejection reason is passed to the unhandled rejection handler.
+       * @private {number}
+       */
+      this.unhandledRejectionId_ = 0;
+    } else if (CancellablePromise.UNHANDLED_REJECTION_DELAY === 0) {
+      /**
+       * When the {@code UNHANDLED_REJECTION_DELAY} is set to 0 milliseconds, a
+       * boolean that is set if the Promise is rejected, and reset to false if an
+       * {@code onRejected} callback is invoked for the Promise (or one of its
+       * descendants). If the rejection is not handled before the next timestep,
+       * the rejection reason is passed to the unhandled rejection handler.
+       * @private {boolean}
+       */
+      this.hadUnhandledRejection_ = false;
+    }
+
+    try {
+      var self = this;
+      resolver.call(opt_context, function (value) {
+        self.resolve_(CancellablePromise.State_.FULFILLED, value);
+      }, function (reason) {
+        self.resolve_(CancellablePromise.State_.REJECTED, reason);
+      });
+    } catch (e) {
+      this.resolve_(CancellablePromise.State_.REJECTED, e);
+    }
+  };
+
+  /**
+   * The delay in milliseconds before a rejected Promise's reason is passed to
+   * the rejection handler. By default, the rejection handler rethrows the
+   * rejection reason so that it appears in the developer console or
+   * {@code window.onerror} handler.
+   * Rejections are rethrown as quickly as possible by default. A negative value
+   * disables rejection handling entirely.
+   * @type {number}
+   */
+  CancellablePromise.UNHANDLED_REJECTION_DELAY = 0;
+
+  /**
+   * The possible internal states for a Promise. These states are not directly
+   * observable to external callers.
+   * @enum {number}
+   * @private
+   */
+  CancellablePromise.State_ = {
+    /** The Promise is waiting for resolution. */
+    PENDING: 0,
+
+    /** The Promise is blocked waiting for the result of another Thenable. */
+    BLOCKED: 1,
+
+    /** The Promise has been resolved with a fulfillment value. */
+    FULFILLED: 2,
+
+    /** The Promise has been resolved with a rejection reason. */
+    REJECTED: 3
+  };
+
+  /**
+   * Typedef for entries in the callback chain. Each call to {@code then},
+   * {@code thenCatch}, or {@code thenAlways} creates an entry containing the
+   * functions that may be invoked once the Promise is resolved.
+   *
+   * @typedef {{
+   *   child: CancellablePromise,
+   *   onFulfilled: function(*),
+   *   onRejected: function(*)
+   * }}
+   * @private
+   */
+  CancellablePromise.CallbackEntry_ = null;
+
+  /**
+   * @param {(TYPE|Thenable.<TYPE>|Thenable)=} opt_value
+   * @return {!CancellablePromise.<TYPE>} A new Promise that is immediately resolved
+   *     with the given value.
+   * @template TYPE
+   */
+  CancellablePromise.resolve = function (opt_value) {
+    return new CancellablePromise(function (resolve) {
+      resolve(opt_value);
+    });
+  };
+
+  /**
+   * @param {*=} opt_reason
+   * @return {!CancellablePromise} A new Promise that is immediately rejected with the
+   *     given reason.
+   */
+  CancellablePromise.reject = function (opt_reason) {
+    return new CancellablePromise(function (resolve, reject) {
+      reject(opt_reason);
+    });
+  };
+
+  /**
+   * @param {!Array.<!(Thenable.<TYPE>|Thenable)>} promises
+   * @return {!CancellablePromise.<TYPE>} A Promise that receives the result of the
+   *     first Promise (or Promise-like) input to complete.
+   * @template TYPE
+   */
+  CancellablePromise.race = function (promises) {
+    return new CancellablePromise(function (resolve, reject) {
+      if (!promises.length) {
+        resolve(undefined);
+      }
+      for (var i = 0, promise; promise = promises[i]; i++) {
+        promise.then(resolve, reject);
+      }
+    });
+  };
+
+  /**
+   * @param {!Array.<!(Thenable.<TYPE>|Thenable)>} promises
+   * @return {!CancellablePromise.<!Array.<TYPE>>} A Promise that receives a list of
+   *     every fulfilled value once every input Promise (or Promise-like) is
+   *     successfully fulfilled, or is rejected by the first rejection result.
+   * @template TYPE
+   */
+  CancellablePromise.all = function (promises) {
+    return new CancellablePromise(function (resolve, reject) {
+      var toFulfill = promises.length;
+      var values = [];
+
+      if (!toFulfill) {
+        resolve(values);
+        return;
+      }
+
+      var onFulfill = function onFulfill(index, value) {
+        toFulfill--;
+        values[index] = value;
+        if (toFulfill === 0) {
+          resolve(values);
+        }
+      };
+
+      var onReject = function onReject(reason) {
+        reject(reason);
+      };
+
+      for (var i = 0, promise; promise = promises[i]; i++) {
+        promise.then(partial(onFulfill, i), onReject);
+      }
+    });
+  };
+
+  /**
+   * @param {!Array.<!(Thenable.<TYPE>|Thenable)>} promises
+   * @return {!CancellablePromise.<TYPE>} A Promise that receives the value of
+   *     the first input to be fulfilled, or is rejected with a list of every
+   *     rejection reason if all inputs are rejected.
+   * @template TYPE
+   */
+  CancellablePromise.firstFulfilled = function (promises) {
+    return new CancellablePromise(function (resolve, reject) {
+      var toReject = promises.length;
+      var reasons = [];
+
+      if (!toReject) {
+        resolve(undefined);
+        return;
+      }
+
+      var onFulfill = function onFulfill(value) {
+        resolve(value);
+      };
+
+      var onReject = function onReject(index, reason) {
+        toReject--;
+        reasons[index] = reason;
+        if (toReject === 0) {
+          reject(reasons);
+        }
+      };
+
+      for (var i = 0, promise; promise = promises[i]; i++) {
+        promise.then(onFulfill, partial(onReject, i));
+      }
+    });
+  };
+
+  /**
+   * Adds callbacks that will operate on the result of the Promise, returning a
+   * new child Promise.
+   *
+   * If the Promise is fulfilled, the {@code onFulfilled} callback will be invoked
+   * with the fulfillment value as argument, and the child Promise will be
+   * fulfilled with the return value of the callback. If the callback throws an
+   * exception, the child Promise will be rejected with the thrown value instead.
+   *
+   * If the Promise is rejected, the {@code onRejected} callback will be invoked
+   * with the rejection reason as argument, and the child Promise will be rejected
+   * with the return value (or thrown value) of the callback.
+   *
+   * @override
+   */
+  CancellablePromise.prototype.then = function (opt_onFulfilled, opt_onRejected, opt_context) {
+    return this.addChildPromise_(core.isFunction(opt_onFulfilled) ? opt_onFulfilled : null, core.isFunction(opt_onRejected) ? opt_onRejected : null, opt_context);
+  };
+  Thenable.addImplementation(CancellablePromise);
+
+  /**
+   * Adds a callback that will be invoked whether the Promise is fulfilled or
+   * rejected. The callback receives no argument, and no new child Promise is
+   * created. This is useful for ensuring that cleanup takes place after certain
+   * asynchronous operations. Callbacks added with {@code thenAlways} will be
+   * executed in the same order with other calls to {@code then},
+   * {@code thenAlways}, or {@code thenCatch}.
+   *
+   * Since it does not produce a new child Promise, cancellation propagation is
+   * not prevented by adding callbacks with {@code thenAlways}. A Promise that has
+   * a cleanup handler added with {@code thenAlways} will be canceled if all of
+   * its children created by {@code then} (or {@code thenCatch}) are canceled.
+   *
+   * @param {function(this:THIS): void} onResolved A function that will be invoked
+   *     when the Promise is resolved.
+   * @param {THIS=} opt_context An optional context object that will be the
+   *     execution context for the callbacks. By default, functions are executed
+   *     in the global scope.
+   * @return {!CancellablePromise.<TYPE>} This Promise, for chaining additional calls.
+   * @template THIS
+   */
+  CancellablePromise.prototype.thenAlways = function (onResolved, opt_context) {
+    var callback = function callback() {
+      try {
+        // Ensure that no arguments are passed to onResolved.
+        onResolved.call(opt_context);
+      } catch (err) {
+        CancellablePromise.handleRejection_.call(null, err);
+      }
+    };
+
+    this.addCallbackEntry_({
+      child: null,
+      onRejected: callback,
+      onFulfilled: callback
+    });
+    return this;
+  };
+
+  /**
+   * Adds a callback that will be invoked only if the Promise is rejected. This
+   * is equivalent to {@code then(null, onRejected)}.
+   *
+   * @param {!function(this:THIS, *): *} onRejected A function that will be
+   *     invoked with the rejection reason if the Promise is rejected.
+   * @param {THIS=} opt_context An optional context object that will be the
+   *     execution context for the callbacks. By default, functions are executed
+   *     in the global scope.
+   * @return {!CancellablePromise} A new Promise that will receive the result of the
+   *     callback.
+   * @template THIS
+   */
+  CancellablePromise.prototype.thenCatch = function (onRejected, opt_context) {
+    return this.addChildPromise_(null, onRejected, opt_context);
+  };
+
+  /**
+   * Alias of {@link CancellablePromise.prototype.thenCatch}
+   */
+  CancellablePromise.prototype.catch = CancellablePromise.prototype.thenCatch;
+
+  /**
+   * Cancels the Promise if it is still pending by rejecting it with a cancel
+   * Error. No action is performed if the Promise is already resolved.
+   *
+   * All child Promises of the canceled Promise will be rejected with the same
+   * cancel error, as with normal Promise rejection. If the Promise to be canceled
+   * is the only child of a pending Promise, the parent Promise will also be
+   * canceled. Cancellation may propagate upward through multiple generations.
+   *
+   * @param {string=} opt_message An optional debugging message for describing the
+   *     cancellation reason.
+   */
+  CancellablePromise.prototype.cancel = function (opt_message) {
+    if (this.state_ === CancellablePromise.State_.PENDING) {
+      async.run(function () {
+        var err = new CancellablePromise.CancellationError(opt_message);
+        err.IS_CANCELLATION_ERROR = true;
+        this.cancelInternal_(err);
+      }, this);
+    }
+  };
+
+  /**
+   * Cancels this Promise with the given error.
+   *
+   * @param {!Error} err The cancellation error.
+   * @private
+   */
+  CancellablePromise.prototype.cancelInternal_ = function (err) {
+    if (this.state_ === CancellablePromise.State_.PENDING) {
+      if (this.parent_) {
+        // Cancel the Promise and remove it from the parent's child list.
+        this.parent_.cancelChild_(this, err);
+      } else {
+        this.resolve_(CancellablePromise.State_.REJECTED, err);
+      }
+    }
+  };
+
+  /**
+   * Cancels a child Promise from the list of callback entries. If the Promise has
+   * not already been resolved, reject it with a cancel error. If there are no
+   * other children in the list of callback entries, propagate the cancellation
+   * by canceling this Promise as well.
+   *
+   * @param {!CancellablePromise} childPromise The Promise to cancel.
+   * @param {!Error} err The cancel error to use for rejecting the Promise.
+   * @private
+   */
+  CancellablePromise.prototype.cancelChild_ = function (childPromise, err) {
+    if (!this.callbackEntries_) {
+      return;
+    }
+    var childCount = 0;
+    var childIndex = -1;
+
+    // Find the callback entry for the childPromise, and count whether there are
+    // additional child Promises.
+    for (var i = 0, entry; entry = this.callbackEntries_[i]; i++) {
+      var child = entry.child;
+      if (child) {
+        childCount++;
+        if (child === childPromise) {
+          childIndex = i;
+        }
+        if (childIndex >= 0 && childCount > 1) {
+          break;
+        }
+      }
+    }
+
+    // If the child Promise was the only child, cancel this Promise as well.
+    // Otherwise, reject only the child Promise with the cancel error.
+    if (childIndex >= 0) {
+      if (this.state_ === CancellablePromise.State_.PENDING && childCount === 1) {
+        this.cancelInternal_(err);
+      } else {
+        var callbackEntry = this.callbackEntries_.splice(childIndex, 1)[0];
+        this.executeCallback_(callbackEntry, CancellablePromise.State_.REJECTED, err);
+      }
+    }
+  };
+
+  /**
+   * Adds a callback entry to the current Promise, and schedules callback
+   * execution if the Promise has already been resolved.
+   *
+   * @param {CancellablePromise.CallbackEntry_} callbackEntry Record containing
+   *     {@code onFulfilled} and {@code onRejected} callbacks to execute after
+   *     the Promise is resolved.
+   * @private
+   */
+  CancellablePromise.prototype.addCallbackEntry_ = function (callbackEntry) {
+    if ((!this.callbackEntries_ || !this.callbackEntries_.length) && (this.state_ === CancellablePromise.State_.FULFILLED || this.state_ === CancellablePromise.State_.REJECTED)) {
+      this.scheduleCallbacks_();
+    }
+    if (!this.callbackEntries_) {
+      this.callbackEntries_ = [];
+    }
+    this.callbackEntries_.push(callbackEntry);
+  };
+
+  /**
+   * Creates a child Promise and adds it to the callback entry list. The result of
+   * the child Promise is determined by the state of the parent Promise and the
+   * result of the {@code onFulfilled} or {@code onRejected} callbacks as
+   * specified in the Promise resolution procedure.
+   *
+   * @see http://promisesaplus.com/#the__method
+   *
+   * @param {?function(this:THIS, TYPE):
+   *          (RESULT|CancellablePromise.<RESULT>|Thenable)} onFulfilled A callback that
+   *     will be invoked if the Promise is fullfilled, or null.
+   * @param {?function(this:THIS, *): *} onRejected A callback that will be
+   *     invoked if the Promise is rejected, or null.
+   * @param {THIS=} opt_context An optional execution context for the callbacks.
+   *     in the default calling context.
+   * @return {!CancellablePromise} The child Promise.
+   * @template RESULT,THIS
+   * @private
+   */
+  CancellablePromise.prototype.addChildPromise_ = function (onFulfilled, onRejected, opt_context) {
+
+    var callbackEntry = {
+      child: null,
+      onFulfilled: null,
+      onRejected: null
+    };
+
+    callbackEntry.child = new CancellablePromise(function (resolve, reject) {
+      // Invoke onFulfilled, or resolve with the parent's value if absent.
+      callbackEntry.onFulfilled = onFulfilled ? function (value) {
+        try {
+          var result = onFulfilled.call(opt_context, value);
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      } : resolve;
+
+      // Invoke onRejected, or reject with the parent's reason if absent.
+      callbackEntry.onRejected = onRejected ? function (reason) {
+        try {
+          var result = onRejected.call(opt_context, reason);
+          if (!core.isDef(result) && reason.IS_CANCELLATION_ERROR) {
+            // Propagate cancellation to children if no other result is returned.
+            reject(reason);
+          } else {
+            resolve(result);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      } : reject;
+    });
+
+    callbackEntry.child.parent_ = this;
+    this.addCallbackEntry_(
+    /** @type {CancellablePromise.CallbackEntry_} */callbackEntry);
+    return callbackEntry.child;
+  };
+
+  /**
+   * Unblocks the Promise and fulfills it with the given value.
+   *
+   * @param {TYPE} value
+   * @private
+   */
+  CancellablePromise.prototype.unblockAndFulfill_ = function (value) {
+    if (this.state_ !== CancellablePromise.State_.BLOCKED) {
+      throw new Error('CancellablePromise is not blocked.');
+    }
+    this.state_ = CancellablePromise.State_.PENDING;
+    this.resolve_(CancellablePromise.State_.FULFILLED, value);
+  };
+
+  /**
+   * Unblocks the Promise and rejects it with the given rejection reason.
+   *
+   * @param {*} reason
+   * @private
+   */
+  CancellablePromise.prototype.unblockAndReject_ = function (reason) {
+    if (this.state_ !== CancellablePromise.State_.BLOCKED) {
+      throw new Error('CancellablePromise is not blocked.');
+    }
+    this.state_ = CancellablePromise.State_.PENDING;
+    this.resolve_(CancellablePromise.State_.REJECTED, reason);
+  };
+
+  /**
+   * Attempts to resolve a Promise with a given resolution state and value. This
+   * is a no-op if the given Promise has already been resolved.
+   *
+   * If the given result is a Thenable (such as another Promise), the Promise will
+   * be resolved with the same state and result as the Thenable once it is itself
+   * resolved.
+   *
+   * If the given result is not a Thenable, the Promise will be fulfilled or
+   * rejected with that result based on the given state.
+   *
+   * @see http://promisesaplus.com/#the_promise_resolution_procedure
+   *
+   * @param {CancellablePromise.State_} state
+   * @param {*} x The result to apply to the Promise.
+   * @private
+   */
+  CancellablePromise.prototype.resolve_ = function (state, x) {
+    if (this.state_ !== CancellablePromise.State_.PENDING) {
+      return;
+    }
+
+    if (this === x) {
+      state = CancellablePromise.State_.REJECTED;
+      x = new TypeError('CancellablePromise cannot resolve to itself');
+    } else if (Thenable.isImplementedBy(x)) {
+      x = /** @type {!Thenable} */x;
+      this.state_ = CancellablePromise.State_.BLOCKED;
+      x.then(this.unblockAndFulfill_, this.unblockAndReject_, this);
+      return;
+    } else if (core.isObject(x)) {
+      try {
+        var then = x.then;
+        if (core.isFunction(then)) {
+          this.tryThen_(x, then);
+          return;
+        }
+      } catch (e) {
+        state = CancellablePromise.State_.REJECTED;
+        x = e;
+      }
+    }
+
+    this.result_ = x;
+    this.state_ = state;
+    this.scheduleCallbacks_();
+
+    if (state === CancellablePromise.State_.REJECTED && !x.IS_CANCELLATION_ERROR) {
+      CancellablePromise.addUnhandledRejection_(this, x);
+    }
+  };
+
+  /**
+   * Attempts to call the {@code then} method on an object in the hopes that it is
+   * a Promise-compatible instance. This allows interoperation between different
+   * Promise implementations, however a non-compliant object may cause a Promise
+   * to hang indefinitely. If the {@code then} method throws an exception, the
+   * dependent Promise will be rejected with the thrown value.
+   *
+   * @see http://promisesaplus.com/#point-70
+   *
+   * @param {Thenable} thenable An object with a {@code then} method that may be
+   *     compatible with the Promise/A+ specification.
+   * @param {!Function} then The {@code then} method of the Thenable object.
+   * @private
+   */
+  CancellablePromise.prototype.tryThen_ = function (thenable, then) {
+    this.state_ = CancellablePromise.State_.BLOCKED;
+    var promise = this;
+    var called = false;
+
+    var resolve = function resolve(value) {
+      if (!called) {
+        called = true;
+        promise.unblockAndFulfill_(value);
+      }
+    };
+
+    var reject = function reject(reason) {
+      if (!called) {
+        called = true;
+        promise.unblockAndReject_(reason);
+      }
+    };
+
+    try {
+      then.call(thenable, resolve, reject);
+    } catch (e) {
+      reject(e);
+    }
+  };
+
+  /**
+   * Executes the pending callbacks of a resolved Promise after a timeout.
+   *
+   * Section 2.2.4 of the Promises/A+ specification requires that Promise
+   * callbacks must only be invoked from a call stack that only contains Promise
+   * implementation code, which we accomplish by invoking callback execution after
+   * a timeout. If {@code startExecution_} is called multiple times for the same
+   * Promise, the callback chain will be evaluated only once. Additional callbacks
+   * may be added during the evaluation phase, and will be executed in the same
+   * event loop.
+   *
+   * All Promises added to the waiting list during the same browser event loop
+   * will be executed in one batch to avoid using a separate timeout per Promise.
+   *
+   * @private
+   */
+  CancellablePromise.prototype.scheduleCallbacks_ = function () {
+    if (!this.executing_) {
+      this.executing_ = true;
+      async.run(this.executeCallbacks_, this);
+    }
+  };
+
+  /**
+   * Executes all pending callbacks for this Promise.
+   *
+   * @private
+   */
+  CancellablePromise.prototype.executeCallbacks_ = function () {
+    while (this.callbackEntries_ && this.callbackEntries_.length) {
+      var entries = this.callbackEntries_;
+      this.callbackEntries_ = [];
+
+      for (var i = 0; i < entries.length; i++) {
+        this.executeCallback_(entries[i], this.state_, this.result_);
+      }
+    }
+    this.executing_ = false;
+  };
+
+  /**
+   * Executes a pending callback for this Promise. Invokes an {@code onFulfilled}
+   * or {@code onRejected} callback based on the resolved state of the Promise.
+   *
+   * @param {!CancellablePromise.CallbackEntry_} callbackEntry An entry containing the
+   *     onFulfilled and/or onRejected callbacks for this step.
+   * @param {CancellablePromise.State_} state The resolution status of the Promise,
+   *     either FULFILLED or REJECTED.
+   * @param {*} result The resolved result of the Promise.
+   * @private
+   */
+  CancellablePromise.prototype.executeCallback_ = function (callbackEntry, state, result) {
+    if (state === CancellablePromise.State_.FULFILLED) {
+      callbackEntry.onFulfilled(result);
+    } else {
+      this.removeUnhandledRejection_();
+      callbackEntry.onRejected(result);
+    }
+  };
+
+  /**
+   * Marks this rejected Promise as having being handled. Also marks any parent
+   * Promises in the rejected state as handled. The rejection handler will no
+   * longer be invoked for this Promise (if it has not been called already).
+   *
+   * @private
+   */
+  CancellablePromise.prototype.removeUnhandledRejection_ = function () {
+    var p;
+    if (CancellablePromise.UNHANDLED_REJECTION_DELAY > 0) {
+      for (p = this; p && p.unhandledRejectionId_; p = p.parent_) {
+        clearTimeout(p.unhandledRejectionId_);
+        p.unhandledRejectionId_ = 0;
+      }
+    } else if (CancellablePromise.UNHANDLED_REJECTION_DELAY === 0) {
+      for (p = this; p && p.hadUnhandledRejection_; p = p.parent_) {
+        p.hadUnhandledRejection_ = false;
+      }
+    }
+  };
+
+  /**
+   * Marks this rejected Promise as unhandled. If no {@code onRejected} callback
+   * is called for this Promise before the {@code UNHANDLED_REJECTION_DELAY}
+   * expires, the reason will be passed to the unhandled rejection handler. The
+   * handler typically rethrows the rejection reason so that it becomes visible in
+   * the developer console.
+   *
+   * @param {!CancellablePromise} promise The rejected Promise.
+   * @param {*} reason The Promise rejection reason.
+   * @private
+   */
+  CancellablePromise.addUnhandledRejection_ = function (promise, reason) {
+    if (CancellablePromise.UNHANDLED_REJECTION_DELAY > 0) {
+      promise.unhandledRejectionId_ = setTimeout(function () {
+        CancellablePromise.handleRejection_.call(null, reason);
+      }, CancellablePromise.UNHANDLED_REJECTION_DELAY);
+    } else if (CancellablePromise.UNHANDLED_REJECTION_DELAY === 0) {
+      promise.hadUnhandledRejection_ = true;
+      async.run(function () {
+        if (promise.hadUnhandledRejection_) {
+          CancellablePromise.handleRejection_.call(null, reason);
+        }
+      });
+    }
+  };
+
+  /**
+   * A method that is invoked with the rejection reasons for Promises that are
+   * rejected but have no {@code onRejected} callbacks registered yet.
+   * @type {function(*)}
+   * @private
+   */
+  CancellablePromise.handleRejection_ = async.throwException;
+
+  /**
+   * Sets a handler that will be called with reasons from unhandled rejected
+   * Promises. If the rejected Promise (or one of its descendants) has an
+   * {@code onRejected} callback registered, the rejection will be considered
+   * handled, and the rejection handler will not be called.
+   *
+   * By default, unhandled rejections are rethrown so that the error may be
+   * captured by the developer console or a {@code window.onerror} handler.
+   *
+   * @param {function(*)} handler A function that will be called with reasons from
+   *     rejected Promises. Defaults to {@code async.throwException}.
+   */
+  CancellablePromise.setUnhandledRejectionHandler = function (handler) {
+    CancellablePromise.handleRejection_ = handler;
+  };
+
+  /**
+   * Error used as a rejection reason for canceled Promises.
+   *
+   * @param {string=} opt_message
+   * @constructor
+   * @extends {Error}
+   * @final
+   */
+  CancellablePromise.CancellationError = function (_Error) {
+    babelHelpers.inherits(_class, _Error);
+
+    function _class(opt_message) {
+      babelHelpers.classCallCheck(this, _class);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, _Error.call(this, opt_message));
+
+      if (opt_message) {
+        _this.message = opt_message;
+      }
+      return _this;
+    }
+
+    return _class;
+  }(Error);
+
+  /** @override */
+  CancellablePromise.CancellationError.prototype.name = 'cancel';
+
+  this.metalNamed.Promise = this.metalNamed.Promise || {};
+  this.metalNamed.Promise.CancellablePromise = CancellablePromise;
+  this.metal.Promise = CancellablePromise;
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metalNamed.metal.core;
+	var Uri = this.metal.Uri;
+	var Promise = this.metalNamed.Promise.CancellablePromise;
+
+	var Ajax = function () {
+		function Ajax() {
+			babelHelpers.classCallCheck(this, Ajax);
+		}
+
+		/**
+   * XmlHttpRequest's getAllResponseHeaders() method returns a string of
+   * response headers according to the format described on the spec:
+   * {@link http://www.w3.org/TR/XMLHttpRequest/#the-getallresponseheaders-method}.
+   * This method parses that string into a user-friendly name/value pair
+   * object.
+   * @param {string} allHeaders All headers as string.
+   * @return {!Array.<Object<string, string>>}
+   */
+
+		Ajax.parseResponseHeaders = function parseResponseHeaders(allHeaders) {
+			var headers = [];
+			if (!allHeaders) {
+				return headers;
+			}
+			var pairs = allHeaders.split('\r\n');
+			for (var i = 0; i < pairs.length; i++) {
+				var index = pairs[i].indexOf(': ');
+				if (index > 0) {
+					var name = pairs[i].substring(0, index);
+					var value = pairs[i].substring(index + 2);
+					headers.push({
+						name: name,
+						value: value
+					});
+				}
+			}
+			return headers;
+		};
+
+		/**
+   * Requests the url using XMLHttpRequest.
+   * @param {!string} url
+   * @param {!string} method
+   * @param {?string} body
+   * @param {MultiMap=} opt_headers
+   * @param {MultiMap=} opt_params
+   * @param {number=} opt_timeout
+   * @param {boolean=} opt_sync
+   * @return {Promise} Deferred ajax request.
+   * @protected
+   */
+
+
+		Ajax.request = function request(url, method, body, opt_headers, opt_params, opt_timeout, opt_sync) {
+			var request = new XMLHttpRequest();
+
+			var promise = new Promise(function (resolve, reject) {
+				request.onload = function () {
+					if (request.aborted) {
+						request.onerror();
+						return;
+					}
+					resolve(request);
+				};
+				request.onerror = function () {
+					var error = new Error('Request error');
+					error.request = request;
+					reject(error);
+				};
+			}).thenCatch(function (reason) {
+				request.abort();
+				throw reason;
+			}).thenAlways(function () {
+				clearTimeout(timeout);
+			});
+
+			if (opt_params) {
+				url = new Uri(url).addParametersFromMultiMap(opt_params).toString();
+			}
+
+			request.open(method, url, !opt_sync);
+
+			if (opt_headers) {
+				opt_headers.names().forEach(function (name) {
+					request.setRequestHeader(name, opt_headers.getAll(name).join(', '));
+				});
+			}
+
+			request.send(core.isDef(body) ? body : null);
+
+			if (core.isDefAndNotNull(opt_timeout)) {
+				var timeout = setTimeout(function () {
+					promise.cancel('Request timeout');
+				}, opt_timeout);
+			}
+
+			return promise;
+		};
+
+		return Ajax;
+	}();
+
+	this.metal.Ajax = Ajax;
 }).call(this);
 'use strict';
 
@@ -11702,12 +13580,14 @@ babelHelpers;
       ie_close('tr');
       ie_close('thead');
       ie_open('tbody');
-      var arrayRowValueList39 = opt_data.value;
-      var arrayRowValueListLen39 = arrayRowValueList39.length;
-      for (var arrayRowValueIndex39 = 0; arrayRowValueIndex39 < arrayRowValueListLen39; arrayRowValueIndex39++) {
-        var arrayRowValueData39 = arrayRowValueList39[arrayRowValueIndex39];
-        var rowIndex__soy33 = arrayRowValueIndex39 + 1;
-        $renderRow_({ arrayRowValue: arrayRowValueData39, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy33 }, null, opt_ijData);
+      if (opt_data.value) {
+        var arrayRowValueList41 = opt_data.value;
+        var arrayRowValueListLen41 = arrayRowValueList41.length;
+        for (var arrayRowValueIndex41 = 0; arrayRowValueIndex41 < arrayRowValueListLen41; arrayRowValueIndex41++) {
+          var arrayRowValueData41 = arrayRowValueList41[arrayRowValueIndex41];
+          var rowIndex__soy35 = arrayRowValueIndex41 + 1;
+          $renderRow_({ arrayRowValue: arrayRowValueData41, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy35 }, null, opt_ijData);
+        }
       }
       ie_close('tbody');
       ie_close('table');
@@ -11726,13 +13606,13 @@ babelHelpers;
      */
     function $renderRow_(opt_data, opt_ignored, opt_ijData) {
       ie_open('tr', null, null, 'class', 'row-' + opt_data.rowIndex);
-      var keyList53 = soy.$$getMapKeys(opt_data.arrayRowValue);
-      var keyListLen53 = keyList53.length;
-      for (var keyIndex53 = 0; keyIndex53 < keyListLen53; keyIndex53++) {
-        var keyData53 = keyList53[keyIndex53];
-        if (opt_data.columnConfig[keyData53]) {
-          ie_open('td', null, null, 'class', opt_data.columnClasses[keyIndex53]);
-          itext((goog.asserts.assert(opt_data.arrayRowValue[keyData53] != null), opt_data.arrayRowValue[keyData53]));
+      var keyList55 = soy.$$getMapKeys(opt_data.arrayRowValue);
+      var keyListLen55 = keyList55.length;
+      for (var keyIndex55 = 0; keyIndex55 < keyListLen55; keyIndex55++) {
+        var keyData55 = keyList55[keyIndex55];
+        if (opt_data.columnConfig[keyData55]) {
+          ie_open('td', null, null, 'class', opt_data.columnClasses[keyIndex55]);
+          itext((goog.asserts.assert(opt_data.arrayRowValue[keyData55] != null), opt_data.arrayRowValue[keyData55]));
           ie_close('td');
         }
       }
@@ -11792,9 +13672,11 @@ babelHelpers;
 'use strict';
 
 (function () {
+	var Ajax = this.metal.Ajax;
 	var templates = this.metal.ZsFootballTable;
 	var Component = this.metal.component;
 	var Soy = this.metal.Soy;
+	var Uri = this.metal.Uri;
 
 	var ZsFootballTable = function (_Component) {
 		babelHelpers.inherits(ZsFootballTable, _Component);
@@ -11805,11 +13687,23 @@ babelHelpers;
 		}
 
 		ZsFootballTable.prototype.created = function created() {
-			if (!this.rounds) {
+			if (!this.rounds.length && this.matches.length) {
 				this.rounds = this.processMatches_();
-			}
 
-			this.selectedRound = this.rounds.length;
+				this.selectedRound = this.rounds.length;
+			} else if (this.url) {
+				var table = this;
+
+				Ajax.request(this.url.toString(), 'get').then(function (xhrResponse) {
+					var response = xhrResponse;
+
+					table.matches = JSON.parse(response.response);
+
+					table.rounds = table.processMatches_();
+
+					table.selectedRound = table.rounds.length;
+				});
+			}
 		};
 
 		/**
@@ -12026,6 +13920,22 @@ babelHelpers;
 			return rounds;
 		};
 
+		/**
+   * Instantiates a metal Uri
+   *
+   */
+
+
+		ZsFootballTable.prototype.setUrl_ = function setUrl_(value) {
+			var uri;
+
+			if (value) {
+				uri = new Uri(value);
+			}
+
+			return uri;
+		};
+
 		return ZsFootballTable;
 	}(Component);
 
@@ -12076,7 +13986,8 @@ babelHelpers;
    * @type {Array}
    */
 		rounds: {
-			validator: Array.isArray
+			validator: Array.isArray,
+			value: []
 		},
 
 		/**
@@ -12120,6 +14031,14 @@ babelHelpers;
    */
 		tableColumnClassNames: {
 			value: ['position', 'last-position', 'club', 'played', 'won', 'drawn', 'lost', 'goal-for', 'goal-against', 'point']
+		},
+
+		/**
+   * url
+   * @type {URI}
+   */
+		url: {
+			setter: 'setUrl_'
 		}
 	};
 

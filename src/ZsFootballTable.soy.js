@@ -85,12 +85,14 @@ function $renderTable_(opt_data, opt_ignored, opt_ijData) {
       ie_close('tr');
     ie_close('thead');
     ie_open('tbody');
-      var arrayRowValueList39 = opt_data.value;
-      var arrayRowValueListLen39 = arrayRowValueList39.length;
-      for (var arrayRowValueIndex39 = 0; arrayRowValueIndex39 < arrayRowValueListLen39; arrayRowValueIndex39++) {
-        var arrayRowValueData39 = arrayRowValueList39[arrayRowValueIndex39];
-        var rowIndex__soy33 = arrayRowValueIndex39 + 1;
-        $renderRow_({arrayRowValue: arrayRowValueData39, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy33}, null, opt_ijData);
+      if (opt_data.value) {
+        var arrayRowValueList41 = opt_data.value;
+        var arrayRowValueListLen41 = arrayRowValueList41.length;
+        for (var arrayRowValueIndex41 = 0; arrayRowValueIndex41 < arrayRowValueListLen41; arrayRowValueIndex41++) {
+          var arrayRowValueData41 = arrayRowValueList41[arrayRowValueIndex41];
+          var rowIndex__soy35 = arrayRowValueIndex41 + 1;
+          $renderRow_({arrayRowValue: arrayRowValueData41, columnClasses: opt_data.columnClasses, columnConfig: opt_data.columnConfig, rowIndex: rowIndex__soy35}, null, opt_ijData);
+        }
       }
     ie_close('tbody');
   ie_close('table');
@@ -111,14 +113,14 @@ if (goog.DEBUG) {
 function $renderRow_(opt_data, opt_ignored, opt_ijData) {
   ie_open('tr', null, null,
       'class', 'row-' + opt_data.rowIndex);
-    var keyList53 = soy.$$getMapKeys(opt_data.arrayRowValue);
-    var keyListLen53 = keyList53.length;
-    for (var keyIndex53 = 0; keyIndex53 < keyListLen53; keyIndex53++) {
-      var keyData53 = keyList53[keyIndex53];
-      if (opt_data.columnConfig[keyData53]) {
+    var keyList55 = soy.$$getMapKeys(opt_data.arrayRowValue);
+    var keyListLen55 = keyList55.length;
+    for (var keyIndex55 = 0; keyIndex55 < keyListLen55; keyIndex55++) {
+      var keyData55 = keyList55[keyIndex55];
+      if (opt_data.columnConfig[keyData55]) {
         ie_open('td', null, null,
-            'class', opt_data.columnClasses[keyIndex53]);
-          itext((goog.asserts.assert((opt_data.arrayRowValue[keyData53]) != null), opt_data.arrayRowValue[keyData53]));
+            'class', opt_data.columnClasses[keyIndex55]);
+          itext((goog.asserts.assert((opt_data.arrayRowValue[keyData55]) != null), opt_data.arrayRowValue[keyData55]));
         ie_close('td');
       }
     }
