@@ -1,16 +1,34 @@
 'use strict';
 
+import Ajax from 'metal-ajax';
 import templates from './ZsFootballTable.soy';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
+import Uri from 'metal-uri';
+
 
 class ZsFootballTable extends Component  {
 	created() {
-		if (!this.rounds) {
+		if (!this.rounds.length && this.matches.length) {
 			this.rounds = this.processMatches_();
-		}
 
-		this.selectedRound = this.rounds.length;
+			this.selectedRound = this.rounds.length;
+		}
+		else if (this.url){
+			var table = this;
+
+			Ajax.request(this.url.toString(), 'get').then(
+				function(xhrResponse) {
+					var response = xhrResponse;
+
+					table.matches = JSON.parse(response.response);
+
+					table.rounds = table.processMatches_();
+
+					table.selectedRound = table.rounds.length;
+				}
+			);
+		}
 	}
 
 	/**
@@ -219,6 +237,20 @@ class ZsFootballTable extends Component  {
 
 		return rounds;
 	}
+
+	/**
+	 * Instantiates a metal Uri
+	 *
+	 */
+	setUrl_(value) {
+		var uri;
+
+		if (value) {
+			uri = new Uri(value)
+		}
+
+		return uri;
+	}
 }
 Soy.register(ZsFootballTable, templates);
 
@@ -267,7 +299,8 @@ ZsFootballTable.STATE = {
 	 * @type {Array}
 	 */
 	rounds: {
-		validator: Array.isArray
+		validator: Array.isArray,
+		value: []
 	},
 
 	/**
@@ -311,6 +344,14 @@ ZsFootballTable.STATE = {
 	 */
 	tableColumnClassNames: {
 		value: ['position','last-position','club','played','won','drawn','lost','goal-for','goal-against','point']
+	},
+
+	/**
+	 * url
+	 * @type {URI}
+	 */
+	url: {
+		setter: 'setUrl_'
 	}
 };
 
