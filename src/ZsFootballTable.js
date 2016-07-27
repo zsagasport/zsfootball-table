@@ -132,8 +132,8 @@ class ZsFootballTable extends Component  {
 		for (let i = 0; i < matches.length; i++) {
 			let match = matches[i];
 
-			let club1Name = match.homeClub;
-			let club2Name = match.awayClub;
+			let club1Name = match.homeClub.title;
+			let club2Name = match.awayClub.title;
 			let round = match.round;
 
 			let clubRound = clubRounds[round] || (clubRounds[round - 1] ? this.cloneClubRound_(clubRounds[round - 1]) : {});
