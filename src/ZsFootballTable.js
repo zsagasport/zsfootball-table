@@ -155,7 +155,7 @@ class ZsFootballTable extends Component  {
 				};
 			}
 
-			this.addPoints_(club1, match.homeGoals, match.awayGoals);
+			this.addPoints_(club1, match.getHomeGoals(), match.getAwayGoals());
 
 			clubRound[club1Name] = club1;
 
@@ -176,7 +176,7 @@ class ZsFootballTable extends Component  {
 				};
 			}
 
-			this.addPoints_(club2, match.awayGoals, match.homeGoals);
+			this.addPoints_(club2, match.getAwayGoals(), match.getHomeGoals());
 
 			clubRound[club2Name] = club2;
 
