@@ -239,6 +239,19 @@ class ZsFootballTable extends Component  {
 	}
 
 	/**
+	 *
+	 */
+	setMatches_(values) {
+		var matches = [];
+
+		for(let i = 0; i < values.length; i++) {
+			matches.push(new MatchModel(values[i])); 
+		}
+
+	 	return matches;
+	}
+
+	/**
 	 * Instantiates a metal Uri
 	 *
 	 */
