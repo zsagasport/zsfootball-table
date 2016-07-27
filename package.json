@@ -16,7 +16,6 @@
     "test"
   ],
   "scripts": {
-    "compile": "babel --presets es2015 -d lib/ src/",
     "publish": "npm run compile",
     "test": "gulp test"
   },
@@ -25,14 +24,12 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "metal-ajax": "^1.0.0-rc.1",
+    "metal-ajax": "metal/metal-ajax#master",
     "metal-component": "metal/metal-component#master",
     "metal-soy": "metal/metal-soy#master",
-    "metal-uri": "^1.0.0-rc.2"
+    "metal-uri": "metal/metal-uri#master"
   },
   "devDependencies": {
-    "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0"
   }
