@@ -3,6 +3,7 @@
 import Ajax from 'metal-ajax';
 import templates from './ZsFootballTable.soy';
 import Component from 'metal-component';
+import { MatchModel } from 'zsfootball-models';
 import Soy from 'metal-soy';
 import Uri from 'metal-uri';
 
@@ -303,6 +304,7 @@ ZsFootballTable.STATE = {
 	 * @type {Array}
 	 */
 	matches: {
+		setter: 'setMatches_',
 		validator: Array.isArray,
 		value: []
 	},
