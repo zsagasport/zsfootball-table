@@ -14535,9 +14535,970 @@ babelHelpers;
 'use strict';
 
 (function () {
+	var core = this.metal.metal;
+	var State = this.metal.State;
+
+	var Model = function (_State) {
+		babelHelpers.inherits(Model, _State);
+
+		function Model(opt_config, opt_parentElement) {
+			babelHelpers.classCallCheck(this, Model);
+			return babelHelpers.possibleConstructorReturn(this, _State.call(this, opt_config, opt_parentElement));
+		}
+
+		/**
+   * Makes an unique id for the model.
+   * @return {string} Unique id.
+   * @protected
+   */
+
+
+		Model.prototype.makeId_ = function makeId_() {
+			return core.getUid(this);
+		};
+
+		/**
+   * Provides the default value for id attribute.
+   * @return {string} The id.
+   * @protected
+   */
+
+
+		Model.prototype.setId_ = function setId_(id) {
+			return id ? id : this.makeId_();
+		};
+
+		return Model;
+	}(State);
+
+	Model.STATE = {
+		/**
+   *
+   * @type {string}
+   *
+   */
+		id: {
+			setter: 'setId_',
+			writeOnce: true
+		}
+	};
+
+	this.metal.Model = Model;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Club = function (_Model) {
+		babelHelpers.inherits(Club, _Model);
+
+		function Club() {
+			babelHelpers.classCallCheck(this, Club);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		Club.prototype.getShortTitle = function getShortTitle() {
+			return this.shortTitle ? this.shortTitle : this.title.subString(0, 2).toUpperCase();
+		};
+
+		return Club;
+	}(Model);
+
+	Club.STATE = {
+		/**
+   *
+   */
+		title: {},
+
+		/**
+   *
+   */
+		shortTitle: {}
+	};
+
+	this.metal.Club = Club;
+}).call(this);
+'use strict';
+
+(function () {
+	var Storage = function () {
+		function Storage(type) {
+			babelHelpers.classCallCheck(this, Storage);
+
+			this.storage;
+
+			switch (type) {
+				case Storage.TYPE.LOCAL:
+					this.storage = window.localStorage || {};
+					break;
+				case Storage.TYPE.SESSION:
+					this.storage = window.sessionStorage || {};
+					break;
+			}
+		}
+
+		Storage.prototype.getItem = function getItem(key) {
+			return this.storage[key];
+		};
+
+		Storage.prototype.getJSONItem = function getJSONItem(key) {
+			return JSON.parse(this.getItem(key));
+		};
+
+		Storage.prototype.setItem = function setItem(key, string) {
+			this.storage[key] = string;
+		};
+
+		Storage.prototype.setJSONItem = function setJSONItem(key, object) {
+			this.setItem(key, JSON.stringify(object));
+		};
+
+		Storage.prototype.deleteItem = function deleteItem(key) {
+			delete this.storage[key];
+		};
+
+		Storage.prototype.clear = function clear() {
+			Object.keys(this.storage).forEach(this.deleteItem, this);
+		};
+
+		return Storage;
+	}();
+
+	;
+
+	Storage.TYPE = {
+		LOCAL: 'local',
+		SESSION: 'session'
+	};
+
+	this.metal.Storage = Storage;
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metalNamed.metal.core;
+	var object = this.metalNamed.metal.object;
+	var Storage = this.metal.Storage;
+
+	var ModelUtil = function () {
+		function ModelUtil() {
+			babelHelpers.classCallCheck(this, ModelUtil);
+		}
+
+		/**
+   * Returns an Object if value isObject
+   * @param {number or Object} value
+   * @return {Object or undefined}
+   */
+
+		ModelUtil.getObject = function getObject(value) {
+			var competition;
+
+			if (core.isObject(value)) {
+				ModelUtil.localStorage.setJSONItem(value.id.toString(), value);
+
+				competition = value;
+			} else if (core.isNumber(value)) {
+				var object = ModelUtil.localStorage.getJSONItem(value.toString());
+
+				if (object) {
+					competition = object;
+				}
+			}
+
+			return competition;
+		};
+
+		return ModelUtil;
+	}();
+
+	;
+
+	ModelUtil.localStorage = new Storage(Storage.TYPE.LOCAL);
+
+	this.metal.ModelUtil = ModelUtil;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Season = function (_Model) {
+		babelHelpers.inherits(Season, _Model);
+
+		function Season() {
+			babelHelpers.classCallCheck(this, Season);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Season;
+	}(Model);
+
+	Season.STATE = {
+		/**
+   *
+   */
+		end: {},
+
+		/**
+   *
+   */
+		start: {},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Season = Season;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+	var ModelUtil = this.metal.ModelUtil;
+	var Season = this.metal.Season;
+
+	var Competition = function (_Model) {
+		babelHelpers.inherits(Competition, _Model);
+
+		function Competition() {
+			babelHelpers.classCallCheck(this, Competition);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		/**
+   *
+   */
+
+		Competition.prototype.setSeason_ = function setSeason_(value) {
+			var object = ModelUtil.getObject(value);
+			var season;
+
+			if (object) {
+				season = new Season(object);
+
+				this.seasonId = season.id;
+			}
+
+			return season;
+		};
+
+		/**
+   *
+   */
+
+
+		Competition.prototype.setSport_ = function setSport_(value) {
+			var object = ModelUtil.getObject(value);
+			var sport;
+
+			if (object) {
+				sport = new Sport(object);
+
+				this.sportId = sport.id;
+			}
+
+			return sport;
+		};
+
+		return Competition;
+	}(Model);
+
+	Competition.STATE = {
+		/**
+   *
+   */
+		country: {},
+
+		/**
+   *
+   */
+		season: {
+			setter: 'setSeason_'
+		},
+
+		/**
+   *
+   */
+		sport: {
+			setter: 'setSport_'
+		},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Competition = Competition;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Person = function (_Model) {
+		babelHelpers.inherits(Person, _Model);
+
+		function Person() {
+			babelHelpers.classCallCheck(this, Person);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		Person.prototype.getFullName_ = function getFullName_() {
+			return this.firstName + ' ' + this.secondName;
+		};
+
+		return Person;
+	}(Model);
+
+	Person.STATE = {
+		/**
+   *
+   */
+		firstName: {},
+
+		fullName: {
+			valueFn: 'getFullName_'
+		},
+
+		/**
+   *
+   */
+		secondName: {},
+
+		/**
+   *
+   */
+		nickName: {},
+
+		/**
+   *
+   */
+		height: {},
+
+		/**
+   *
+   */
+		weight: {},
+
+		/**
+   *
+   */
+		birthDate: {},
+
+		/**
+   *
+   */
+		birthPlace: {},
+
+		/**
+   *
+   */
+		nationality: {}
+	};
+
+	this.metal.Person = Person;
+}).call(this);
+'use strict';
+
+(function () {
+	var Person = this.metal.Person;
+
+	var Player = function (_Person) {
+		babelHelpers.inherits(Player, _Person);
+
+		function Player() {
+			babelHelpers.classCallCheck(this, Player);
+			return babelHelpers.possibleConstructorReturn(this, _Person.apply(this, arguments));
+		}
+
+		return Player;
+	}(Person);
+
+	Player.STATE = {
+		/**
+   *
+   */
+		image: {},
+
+		/**
+   *
+   */
+		number: {},
+
+		/**
+   *
+   */
+		position: {}
+	};
+
+	this.metal.Player = Player;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+	var Player = this.metal.Player;
+	var core = this.metal.metal;
+
+	var Goal = function (_Model) {
+		babelHelpers.inherits(Goal, _Model);
+
+		function Goal() {
+			babelHelpers.classCallCheck(this, Goal);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		Goal.prototype.setPlayer_ = function setPlayer_(value) {
+			var player = {};
+
+			if (core.isObject(value)) {
+				player = new Player(value);
+			} else if (core.isString(value)) {
+				var names = value.split(' ');
+
+				player = new Player({ firstName: names[0], secondName: names[1] });
+			}
+
+			return player;
+		};
+
+		return Goal;
+	}(Model);
+
+	Goal.STATE = {
+		assist: {},
+
+		time: {
+			validator: core.isNumber
+		},
+
+		player: {
+			setter: 'setPlayer_'
+		},
+
+		ownGoal: {
+			value: false
+		}
+	};
+
+	this.metal.Goal = Goal;
+}).call(this);
+'use strict';
+
+(function () {
+  var Model = this.metal.Model;
+
+  var LineUp = function (_Model) {
+    babelHelpers.inherits(LineUp, _Model);
+
+    function LineUp() {
+      babelHelpers.classCallCheck(this, LineUp);
+      return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+    }
+
+    return LineUp;
+  }(Model);
+
+  LineUp.STATE = {};
+
+  this.metal.LineUp = LineUp;
+}).call(this);
+'use strict';
+
+(function () {
+  var Model = this.metal.Model;
+
+  var LineUpMember = function (_Model) {
+    babelHelpers.inherits(LineUpMember, _Model);
+
+    function LineUpMember() {
+      babelHelpers.classCallCheck(this, LineUpMember);
+      return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+    }
+
+    return LineUpMember;
+  }(Model);
+
+  LineUpMember.STATE = {};
+
+  this.metal.LineUpMember = LineUpMember;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Location = function (_Model) {
+		babelHelpers.inherits(Location, _Model);
+
+		function Location() {
+			babelHelpers.classCallCheck(this, Location);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Location;
+	}(Model);
+
+	Location.STATE = {
+		/**
+   *
+   */
+		built: {},
+
+		/**
+   *
+   */
+		capacity: {},
+
+		/**
+   *
+   */
+		city: {},
+
+		/**
+   *
+   */
+		country: {},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Location = Location;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+	var Club = this.metal.Club;
+	var Goal = this.metal.Goal;
+	var core = this.metal.metal;
+
+	var MatchModel = function (_Model) {
+		babelHelpers.inherits(MatchModel, _Model);
+
+		function MatchModel() {
+			babelHelpers.classCallCheck(this, MatchModel);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		MatchModel.prototype.compareByTime_ = function compareByTime_(goal1, goal2) {
+			if (goal1.time < goal2.time) {
+				return -1;
+			} else if (goal1.time > goal2.time) {
+				return 1;
+			}
+
+			return 0;
+		};
+
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getAwayGoalList = function getAwayGoalList() {
+			return this.goals.awayGoalList || [];
+		};
+
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getAwayGoals = function getAwayGoals() {
+			var awayGoals = this.goals.awayGoals;
+
+			return core.isNumber(awayGoals) ? awayGoals : core.isNumber(awayGoals.firstHalf) ? awayGoals.firstHalf + awayGoals.secondHalf : awayGoals.firstHalf.length + awayGoals.secondHalf.length;
+		};
+
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getHomeGoalList = function getHomeGoalList() {
+			return this.goals.homeGoalList || [];
+		};
+
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getHomeGoals = function getHomeGoals() {
+			var homeGoals = this.goals.homeGoals;
+
+			return core.isNumber(homeGoals) ? homeGoals : core.isNumber(homeGoals.firstHalf) ? homeGoals.firstHalf + homeGoals.secondHalf : homeGoals.firstHalf.length + homeGoals.secondHalf.length;
+		};
+
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getHalfGoals_ = function getHalfGoals_(homeGoals, awayGoals) {
+			var goals = homeGoals.concat(awayGoals);
+
+			return goals.sort(this.compareByTime_);
+		};
+
+		MatchModel.prototype.firstHalfGoals_ = function firstHalfGoals_() {
+			return this.getHalfGoals_(this.goals.homeGoals.firstHalf, this.goals.awayGoals.firstHalf);
+		};
+
+		MatchModel.prototype.secondHalfGoals_ = function secondHalfGoals_() {
+			return this.getHalfGoals_(this.goals.homeGoals.secondHalf, this.goals.awayGoals.secondHalf);
+		};
+
+		/**
+  	 *
+  	 */
+
+
+		MatchModel.prototype.setClub_ = function setClub_(value) {
+			return core.isObject(value) ? new Club(value) : core.isString(value) ? new Club({ title: value }) : {};
+		};
+
+		MatchModel.prototype.createGoalsObject = function createGoalsObject(goalsValue, goalType) {
+			var goals = {};
+
+			if (core.isObject(goalsValue)) {
+				var firstHalf = goalsValue.firstHalf;
+				var secondHalf = goalsValue.secondHalf;
+
+				if (Array.isArray(firstHalf)) {
+					goals.firstHalf = [];
+
+					firstHalf.forEach(function (item) {
+						var goal = new Goal(item);
+
+						goal.goalType = goalType;
+
+						goals.firstHalf.push(goal);
+					});
+				} else {
+					goals.firstHalf = firstHalf;
+				}
+
+				if (Array.isArray(secondHalf)) {
+					goals.secondHalf = [];
+
+					secondHalf.forEach(function (item) {
+						var goal = new Goal(item);
+
+						goal.goalType = goalType;
+
+						goals.secondHalf.push(goal);
+					});
+				} else {
+					goals.secondHalf = secondHalf;
+				}
+			} else {
+				goals = goalsValue;
+			}
+
+			return goals;
+		};
+
+		MatchModel.prototype.setGoals_ = function setGoals_(value) {
+			if (!value) {
+				return value;
+			} else {
+				var goals = {};
+
+				goals.awayGoals = this.createGoalsObject(value.awayGoals, 'awayGoal');
+				goals.homeGoals = this.createGoalsObject(value.homeGoals, 'homeGoal');
+
+				return goals;
+			}
+		};
+
+		return MatchModel;
+	}(Model);
+
+	MatchModel.STATE = {
+		/**
+   * The number of spectators who attended this match
+   * @type {number}
+   */
+		attendance: {},
+
+		/**
+   * It is a club instant, an id or a String which represent the away team
+   * @type {Object|string|number}
+   */
+		awayClub: {
+			setter: 'setClub_'
+		},
+
+		/**
+   * It is true if the match has been finished
+   * @type {boolean}
+   * @default false
+   */
+		finished: {
+			value: false
+		},
+
+		/**
+   * It contains information about the goals which were on this match
+   * @type {Object}
+   * @default {}
+   */
+		goals: {
+			setter: 'setGoals_'
+		},
+
+		firstHalfGoals: {
+			valueFn: 'firstHalfGoals_'
+		},
+
+		secondHalfGoals: {
+			valueFn: 'secondHalfGoals_'
+		},
+
+		/**
+   * It is a club instant, an id or a String which represent the home team
+   * @type {Object|string|number}
+   */
+		homeClub: {
+			setter: 'setClub_'
+		},
+
+		/**
+   * The location where this match was/will be played off
+   * @type {object}
+   */
+		location: {},
+
+		/**
+   * Represents date of this match in milliseconds
+   * @type {number}
+   */
+		matchDate: {},
+
+		referee: {},
+
+		/**
+   * A Round model instanse, an id
+   * @type {Object|number|string}
+   */
+		round: {}
+	};
+
+	this.metal.MatchModel = MatchModel;
+}).call(this);
+'use strict';
+
+(function () {
+	var Competition = this.metal.Competition;
+	var Model = this.metal.Model;
+	var ModelUtil = this.metal.ModelUtil;
+
+	var Round = function (_Model) {
+		babelHelpers.inherits(Round, _Model);
+
+		function Round() {
+			babelHelpers.classCallCheck(this, Round);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		/**
+   *
+   */
+
+		Round.prototype.setCompetition_ = function setCompetition_(value) {
+			var object = ModelUtil.getObject(value);
+			var competition;
+
+			if (object) {
+				competition = new Competition(object);
+
+				this.competitionId = competition.id;
+			}
+
+			return competition;
+		};
+
+		return Round;
+	}(Model);
+
+	Round.STATE = {
+		/**
+   *
+   */
+		competition: {
+			setter: 'setCompetition_'
+		},
+
+		/**
+   *
+   */
+		num: {}
+	};
+
+	this.metal.Round = Round;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Section = function (_Model) {
+		babelHelpers.inherits(Section, _Model);
+
+		function Section() {
+			babelHelpers.classCallCheck(this, Section);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Section;
+	}(Model);
+
+	Section.STATE = {
+		/**
+   *
+   */
+		clubId: {},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Section = Section;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Sport = function (_Model) {
+		babelHelpers.inherits(Sport, _Model);
+
+		function Sport() {
+			babelHelpers.classCallCheck(this, Sport);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Sport;
+	}(Model);
+
+	Sport.STATE = {
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Sport = Sport;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+
+	var Team = function (_Model) {
+		babelHelpers.inherits(Team, _Model);
+
+		function Team() {
+			babelHelpers.classCallCheck(this, Team);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Team;
+	}(Model);
+
+	Team.STATE = {
+		/**
+   *
+   */
+		sectionId: {},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Team = Team;
+}).call(this);
+'use strict';
+
+(function () {
+  var Model = this.metal.Model;
+
+  var TeamMember = function (_Model) {
+    babelHelpers.inherits(TeamMember, _Model);
+
+    function TeamMember() {
+      babelHelpers.classCallCheck(this, TeamMember);
+      return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+    }
+
+    return TeamMember;
+  }(Model);
+
+  TeamMember.STATE = {};
+
+  this.metal.TeamMember = TeamMember;
+}).call(this);
+'use strict';
+
+(function () {
+	var Club = this.metal.Club;
+	var Competition = this.metal.Competition;
+	var Goal = this.metal.Goal;
+	var LineUp = this.metal.LineUp;
+	var LineUpMember = this.metal.LineUpMember;
+	var Location = this.metal.Location;
+	var MatchModel = this.metal.MatchModel;
+	var Model = this.metal.Model;
+	var Person = this.metal.Person;
+	var Player = this.metal.Player;
+	var Round = this.metal.Round;
+	var Season = this.metal.Season;
+	var Section = this.metal.Section;
+	var Sport = this.metal.Sport;
+	var Team = this.metal.Team;
+	var TeamMember = this.metal.TeamMember;
+	var ModelUtil = this.metal.ModelUtil;
+	this.metal.models = Model;
+	this.metalNamed.models = this.metalNamed.models || {};
+	this.metalNamed.models.Club = Club;
+	this.metalNamed.models.Competition = Competition;
+	this.metalNamed.models.Goal = Goal;
+	this.metalNamed.models.LineUp = LineUp;
+	this.metalNamed.models.LineUpMember = LineUpMember;
+	this.metalNamed.models.Location = Location;
+	this.metalNamed.models.MatchModel = MatchModel;
+	this.metalNamed.models.Model = Model;
+	this.metalNamed.models.ModelUtil = ModelUtil;
+	this.metalNamed.models.Person = Person;
+	this.metalNamed.models.Player = Player;
+	this.metalNamed.models.Round = Round;
+	this.metalNamed.models.Season = Season;
+	this.metalNamed.models.Section = Section;
+	this.metalNamed.models.Sport = Sport;
+	this.metalNamed.models.Team = Team;
+	this.metalNamed.models.TeamMember = TeamMember;
+}).call(this);
+'use strict';
+
+(function () {
 	var Ajax = this.metal.Ajax;
 	var templates = this.metal.ZsFootballTable;
 	var Component = this.metal.component;
+	var MatchModel = this.metalNamed.models.MatchModel;
 	var Soy = this.metal.Soy;
 	var Uri = this.metal.Uri;
 
@@ -14677,8 +15638,8 @@ babelHelpers;
 			for (var i = 0; i < matches.length; i++) {
 				var match = matches[i];
 
-				var club1Name = match.homeClub;
-				var club2Name = match.awayClub;
+				var club1Name = match.homeClub.title;
+				var club2Name = match.awayClub.title;
 				var round = match.round;
 
 				var clubRound = clubRounds[round] || (clubRounds[round - 1] ? this.cloneClubRound_(clubRounds[round - 1]) : {});
@@ -14700,7 +15661,7 @@ babelHelpers;
 					};
 				}
 
-				this.addPoints_(club1, match.homeGoals, match.awayGoals);
+				this.addPoints_(club1, match.getHomeGoals(), match.getAwayGoals());
 
 				clubRound[club1Name] = club1;
 
@@ -14721,7 +15682,7 @@ babelHelpers;
 					};
 				}
 
-				this.addPoints_(club2, match.awayGoals, match.homeGoals);
+				this.addPoints_(club2, match.getAwayGoals(), match.getHomeGoals());
 
 				clubRound[club2Name] = club2;
 
@@ -14784,6 +15745,21 @@ babelHelpers;
 		};
 
 		/**
+   *
+   */
+
+
+		ZsFootballTable.prototype.setMatches_ = function setMatches_(values) {
+			var matches = [];
+
+			for (var i = 0; i < values.length; i++) {
+				matches.push(new MatchModel(values[i]));
+			}
+
+			return matches;
+		};
+
+		/**
    * Instantiates a metal Uri
    *
    */
@@ -14840,6 +15816,7 @@ babelHelpers;
    * @type {Array}
    */
 		matches: {
+			setter: 'setMatches_',
 			validator: Array.isArray,
 			value: []
 		},
